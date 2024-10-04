@@ -45,7 +45,7 @@
             console.log('myIDRoot', myIDRoot);
             window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID
         }
-        document.getElementsByTagName('head')[0].appendChild(script);
+        document.body.appendChild(script);
 
 
         window.addEventListener('message', function (e) {
