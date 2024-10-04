@@ -60,7 +60,7 @@
         });
 
         btn.addEventListener('click', () => {
-            console.log('window.MyID', window.MyID);
+            window.MyID.init(myIDRoot);
             window.MyID.open({
                 callback: (data) => {
                     console.log('data', data)
