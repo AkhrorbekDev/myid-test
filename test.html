@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script type="module" crossorigin src="/myid_assets/index.js"></script>
+    <script type="module" crossorigin src="myid_assets/index.js"></script>
 </head>
 <body>
 <iframe id="myid_iframe" src="https://docs.myid.uz/iframe/" allow="camera;fullscreen" allowfullscreen
@@ -15,19 +15,7 @@
 <button id="close">close</button>
 
 <script>
-    navigator.mediaDevices
-        .getUserMedia({
-            video: true,
-            camera: true
-        })
-        .then((stream) => {
-            console.log('stream', stream)
-            /* use the stream */
-        })
-        .catch((err) => {
-            console.log(err)
-            /* handle the error */
-        });
+
 
     const myIDRoot = document.createElement('div');
     const btn = document.getElementById('btn');
@@ -36,7 +24,7 @@
     document.body.appendChild(myIDRoot);
     const iframe = document.getElementById('myid_iframe'); //Используйте refs, если вы используете React, Vue или другой подобный фреймворк https://vuejs.org/guide/essentials/template-refs.html
     const script = document.createElement('script')
-    script.src = 'assets/myid_assets/index.js'
+    script.src = 'myid_assets/index.js'
     script.type = 'module'
     script.crossOrigin = true
     script.onload = () => {
