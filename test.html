@@ -16,19 +16,19 @@
 
 <script>
 
-    navigator.mediaDevices
-        .getUserMedia({
-            video: true,
-            camera: true
-        })
-        .then((stream) => {
-            console.log('stream', stream)
-            /* use the stream */
-        })
-        .catch((err) => {
-            console.log(err)
-            /* handle the error */
-        });
+    // navigator.mediaDevices
+    //     .getUserMedia({
+    //         video: true,
+    //         camera: true
+    //     })
+    //     .then((stream) => {
+    //         console.log('stream', stream)
+    //         /* use the stream */
+    //     })
+    //     .catch((err) => {
+    //         console.log(err)
+    //         /* handle the error */
+    //     });
     const myIDRoot = document.createElement('div');
     const btn = document.getElementById('btn');
     const close = document.getElementById('close');
@@ -49,25 +49,22 @@
 
 
     window.addEventListener('message', function (e) {
-        console.log('message', e)
         // Ваша логика...
 
-        if (e.data.cmd === -1) {
-            document.getElementById('span').innerText += JSON.stringify(e.data);
+        if (e.data.cmd) {
+            document.getElementById('span').innerText = JSON.stringify(e.data);
         }
     });
 
     btn.addEventListener('click', () => {
-        iframe.contentWindow.postMessage({
-            cmd: 'open', config: {
-                locale: 'ru', // - Язык. "uz", "en", "ru".
-                disableSwitch: true, // - Отключить кнопку "переключить камеру"
-                threshold: "" // - Порог размытости изображения, ниже которого библиотека будет отвергать изображение, пока оно не станет менее размытым. По-умолчанию 250.
-            }
-        }, '*');
+        window.MyID.open({
+            callback: (data) => {
+                console.log(data)
+            }, creds: false, intro: true, locale: 'uz', nav: false, min: 1280
+        })
     })
     close.addEventListener('click', () => {
-        iframe.contentWindow.postMessage({cmd: 'close'}, '*'); // закрыть окно и отключить камеру
+        window.MyID.close()
     })
 
 //Например, кнопка "попробовать снова"
