@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <script type="module" crossorigin src="assets/myid_assets/index.js"></script>
+</head>
+<body>
+<!--<iframe id="myid_iframe" src="https://docs.myid.uz/iframe" allow="camera;fullscreen" allowfullscreen-->
+<!--        border="0"></iframe>-->
+<!--<div id="myid_iframe"></div>-->
+<!--<span id="span"> IFrame response </span>-->
+
+<script>
+
+  function init() {
+    const myIDRoot = document.createElement('div');
+    myIDRoot.id = 'myid_window';
+    document.body.appendChild(myIDRoot);
+    const script = document.createElement('script')
+    script.src = 'assets/myid_assets/index.js'
+    script.type = 'module'
+    script.crossOrigin = true
+
+    script.onload = () => {
+      console.log(window.MyID);
+      window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID
+      window.MyID.open({
+        callback: (data) => {
+          console.log(data)
+        }, creds: false, intro: false, locale: 'uz', nav: false, min: 1280
+      })
+    }
+
+    window.addEventListener('message', function (e) {
+      console.log(e)
+      // Ваша логика...
+
+      if (e.data.cmd === -1) {
+        document.getElementById('span').innerText += JSON.stringify(e.data);
+        iframe = document.getElementById('myid_iframe'); //Используйте refs, если вы используете React, Vue или другой подобный фреймворк https://vuejs.org/guide/essentials/template-refs.html
+        iframe.contentWindow.postMessage({cmd: 'open', config: {locale: 'ru'}}, '*');
+      }
+    });
+  }
+
+  init()
+
+
+</script>
+</body>
+</html>
