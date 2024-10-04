@@ -63,14 +63,14 @@
             window.MyID.open({
                 callback: (data) => {
                     console.log('data', data)
-                }, creds: true, intro: true, locale: 'uz', nav: true, min: 1280
+                }, creds: false, intro: false, locale: 'uz', nav: false, min: 1280
             })
         })
         close.addEventListener('click', () => {
             window.MyID.close({
                 callback: (data) => {
                     console.log('data', data)
-                }, creds: true, intro: true, locale: 'uz', nav: true, min: 1280
+                }, creds: false, intro: false, locale: 'uz', nav: false, min: 1280
             })
         })
 
