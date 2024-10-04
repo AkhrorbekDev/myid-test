@@ -19,13 +19,22 @@
         const myIDRoot = document.createElement('div');
         myIDRoot.id = 'myid_window';
         document.body.appendChild(myIDRoot);
-        // const script = document.createElement('script')
-        // script.src = 'assets/myid_assets/index.js'
-        // script.type = 'module'
-        // script.crossOrigin = true
-        // script.onload = () => {
-        //     console.log('script loaded!');
-        // }
+        const script = document.createElement('script')
+        script.src = 'assets/myid_assets/index.js'
+        script.type = 'module'
+        script.crossOrigin = true
+        script.onload = () => {
+            console.log('script loaded!');
+            console.log('init', window.MyID);
+            console.log('myIDRoot', myIDRoot);
+            window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID
+            window.MyID.open({
+                callback: (data) => {
+                    console.log('data', data)
+                }, creds: false, intro: false, locale: 'uz', nav: false, min: 1280
+            })
+        }
+        document.getElementsByTagName('head')[0].appendChild(script);
 
         navigator.mediaDevices
           .getUserMedia({
@@ -40,18 +49,6 @@
               console.log(err)
               /* handle the error */
           });
-
-        window.onload = () => {
-            console.log('window loaded!');
-            console.log('init', window.MyID);
-            console.log('myIDRoot', myIDRoot);
-            window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID
-            window.MyID.open({
-                callback: (data) => {
-                    console.log('data', data)
-                }, creds: false, intro: false, locale: 'uz', nav: false, min: 1280
-            })
-        }
 
         window.addEventListener('message', function (e) {
             console.log(e)
