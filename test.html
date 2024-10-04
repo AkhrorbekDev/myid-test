@@ -23,13 +23,17 @@
         myIDRoot.id = 'myid_window';
         document.body.appendChild(myIDRoot);
         const iframe = document.getElementById('myid_iframe'); //Используйте refs, если вы используете React, Vue или другой подобный фреймворк https://vuejs.org/guide/essentials/template-refs.html
-        // const script = document.createElement('script')
-        // script.src = 'assets/myid_assets/index.js'
-        // script.type = 'module'
-        // script.crossOrigin = true
-        // script.onload = () => {
-        //     console.log('script loaded!');
-        // }
+        const script = document.createElement('script')
+        script.src = 'assets/myid_assets/index.js'
+        script.type = 'module'
+        script.crossOrigin = true
+        script.onload = () => {
+            console.log('script loaded!');
+            console.log('init', window.MyID);
+            console.log('myIDRoot', myIDRoot);
+            window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID
+        }
+        document.getElementsByTagName('head')[0].appendChild(script);
 
         navigator.mediaDevices
             .getUserMedia({
@@ -44,14 +48,6 @@
                 console.log(err)
                 /* handle the error */
             });
-
-        window.onload = () => {
-            console.log('window loaded!');
-            console.log('init', window.MyID);
-            console.log('myIDRoot', myIDRoot);
-            window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID
-
-        }
 
         window.addEventListener('message', function (e) {
             console.log(e)
