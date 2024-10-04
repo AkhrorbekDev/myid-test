@@ -3,52 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script type="module" crossorigin src="assets/myid_assets/index.js"></script>
+    <script type="module" crossorigin src="/assets/myid_assets/index.js"></script>
 </head>
 <body>
 <iframe id="myid_iframe" src="https://docs.myid.uz/iframe" allow="camera;fullscreen" allowfullscreen
         border="0"></iframe>
 <div id="myid_iframe"></div>
 <span id="span"> IFrame response </span>
+<div id="myid_window"></div>
 
 <button id="btn">test</button>
 
 <script>
 
     function init() {
-        const myIDRoot = document.createElement('div');
-        const btn = document.getElementById('btn');
-        myIDRoot.id = 'myid_window';
-        document.body.appendChild(myIDRoot);
-        const script = document.createElement('script')
-        script.src = 'assets/myid_assets/index.js'
-        script.type = 'module'
-        script.crossOrigin = true
+        console.log('init', window.MyID);
+        // const myIDRoot = document.createElement('div');
+        // myIDRoot.id = 'myid_window';
+        // document.body.appendChild(myIDRoot);
+        // const script = document.createElement('script')
+        // script.src = 'assets/myid_assets/index.js'
+        // script.type = 'module'
+        // script.crossOrigin = true
 
+        // script.onload = () => {
+        //     console.log(window.MyID);
+        //     window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID
+        //     window.MyID.open({
+        //         callback: (data) => {
+        //             console.log(data)
+        //         }, creds: false, intro: false, locale: 'uz', nav: false, min: 1280
+        //     })
+        // }
 
-        script.onload = () => {
-            console.log(window.MyID);
-            window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID
-            window.MyID.open({
-                callback: (data) => {
-                    console.log(data)
-                }, creds: false, intro: false, locale: 'uz', nav: false, min: 1280
-            })
+        const myIDRoot = document.getElementById('myid_window')
 
-        }
+        window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID
+        window.MyID.open({
+            callback: (data) => {
+                console.log('data', data)
+            }, creds: false, intro: false, locale: 'uz', nav: false, min: 1280
+        })
 
         navigator.mediaDevices
-            .getUserMedia({
-                video: true
-            })
-            .then((stream) => {
-                console.log(stream)
-                /* use the stream */
-            })
-            .catch((err) => {
-                console.log(err)
-                /* handle the error */
-            });
+          .getUserMedia({
+              video: true
+          })
+          .then((stream) => {
+              console.log('stream', stream)
+              /* use the stream */
+          })
+          .catch((err) => {
+              console.log(err)
+              /* handle the error */
+          });
 
         window.addEventListener('message', function (e) {
             console.log(e)
