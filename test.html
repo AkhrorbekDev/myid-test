@@ -12,13 +12,17 @@
 <span id="span"> IFrame response </span>
 
 <button id="btn">test</button>
+<button id="close">close</button>
 
 <script>
 
     function init() {
         const myIDRoot = document.createElement('div');
+        const btn = document.getElementById('btn');
+        const close = document.getElementById('close');
         myIDRoot.id = 'myid_window';
         document.body.appendChild(myIDRoot);
+        const iframe = document.getElementById('myid_iframe'); //Используйте refs, если вы используете React, Vue или другой подобный фреймворк https://vuejs.org/guide/essentials/template-refs.html
         const script = document.createElement('script')
         script.src = 'assets/myid_assets/index.js'
         script.type = 'module'
@@ -28,27 +32,22 @@
             console.log('init', window.MyID);
             console.log('myIDRoot', myIDRoot);
             window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID
-            window.MyID.open({
-                callback: (data) => {
-                    console.log('data', data)
-                }, creds: false, intro: false, locale: 'uz', nav: false, min: 1280
-            })
         }
         document.getElementsByTagName('head')[0].appendChild(script);
 
         navigator.mediaDevices
-          .getUserMedia({
-              video: true,
-              camera: true
-          })
-          .then((stream) => {
-              console.log('stream', stream)
-              /* use the stream */
-          })
-          .catch((err) => {
-              console.log(err)
-              /* handle the error */
-          });
+            .getUserMedia({
+                video: true,
+                camera: true
+            })
+            .then((stream) => {
+                console.log('stream', stream)
+                /* use the stream */
+            })
+            .catch((err) => {
+                console.log(err)
+                /* handle the error */
+            });
 
         window.addEventListener('message', function (e) {
             console.log(e)
@@ -56,10 +55,28 @@
 
             if (e.data.cmd === -1) {
                 document.getElementById('span').innerText += JSON.stringify(e.data);
-                const iframe = document.getElementById('myid_iframe'); //Используйте refs, если вы используете React, Vue или другой подобный фреймворк https://vuejs.org/guide/essentials/template-refs.html
                 iframe.contentWindow.postMessage({cmd: 'open', config: {locale: 'ru'}}, '*');
             }
         });
+
+        btn.addEventListener('click', () => {
+            window.MyID.open({
+                callback: (data) => {
+                    console.log('data', data)
+                }, creds: false, intro: false, locale: 'uz', nav: false, min: 1280
+            })
+        })
+        close.addEventListener('click', () => {
+            window.MyID.close({
+                callback: (data) => {
+                    console.log('data', data)
+                }, creds: false, intro: false, locale: 'uz', nav: false, min: 1280
+            })
+        })
+
+        iframe.contentWindow.postMessage({cmd: 'close'}, '*');
+//Например, кнопка "попробовать снова"
+        iframe.contentWindow.postMessage({cmd: 'open'}, '*'); //config сохраняется после первого запуска
     }
 
     init()
