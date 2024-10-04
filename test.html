@@ -50,7 +50,7 @@
             });
 
         window.addEventListener('message', function (e) {
-            console.log(e)
+            console.log('message', e)
             // Ваша логика...
 
             if (e.data.cmd === -1) {
@@ -60,6 +60,7 @@
         });
 
         btn.addEventListener('click', () => {
+            console.log('window.MyID', window.MyID);
             window.MyID.open({
                 callback: (data) => {
                     console.log('data', data)
@@ -76,7 +77,7 @@
 
         iframe.contentWindow.postMessage({cmd: 'close'}, '*');
 //Например, кнопка "попробовать снова"
-        iframe.contentWindow.postMessage({cmd: 'open'}, '*'); //config сохраняется после первого запуска
+//         iframe.contentWindow.postMessage({cmd: 'open'}, '*'); //config сохраняется после первого запуска
     }
 
     init()
