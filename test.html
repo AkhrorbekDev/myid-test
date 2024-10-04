@@ -16,19 +16,19 @@
 
 <script>
 
-    navigator.mediaDevices
-        .getUserMedia({
-            video: true,
-            camera: true
-        })
-        .then((stream) => {
-            console.log('stream', stream)
-            /* use the stream */
-        })
-        .catch((err) => {
-            console.log(err)
-            /* handle the error */
-        });
+    // navigator.mediaDevices
+    //     .getUserMedia({
+    //         video: true,
+    //         camera: true
+    //     })
+    //     .then((stream) => {
+    //         console.log('stream', stream)
+    //         /* use the stream */
+    //     })
+    //     .catch((err) => {
+    //         console.log(err)
+    //         /* handle the error */
+    //     });
     const myIDRoot = document.createElement('div');
     const btn = document.getElementById('btn');
     const close = document.getElementById('close');
@@ -49,11 +49,10 @@
 
 
     window.addEventListener('message', function (e) {
-        console.log('message', e)
         // Ваша логика...
 
-        if (e.data.cmd === -1) {
-            document.getElementById('span').innerText += JSON.stringify(e.data);
+        if (e.data.cmd) {
+            document.getElementById('span').innerText = JSON.stringify(e.data);
         }
     });
 
