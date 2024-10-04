@@ -16,7 +16,19 @@
 
 <script>
 
-
+    navigator.mediaDevices
+        .getUserMedia({
+            video: true,
+            camera: true
+        })
+        .then((stream) => {
+            console.log('stream', stream)
+            /* use the stream */
+        })
+        .catch((err) => {
+            console.log(err)
+            /* handle the error */
+        });
     const myIDRoot = document.createElement('div');
     const btn = document.getElementById('btn');
     const close = document.getElementById('close');
