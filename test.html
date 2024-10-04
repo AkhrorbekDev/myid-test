@@ -12,10 +12,12 @@
 <span id="span"> IFrame response </span>
 <div id="myid_window"></div>
 
+<button id="btn">test</button>
+
 <script>
 
     function init() {
-        console.log('init');
+        console.log('init', window.MyID);
         // const myIDRoot = document.createElement('div');
         // myIDRoot.id = 'myid_window';
         // document.body.appendChild(myIDRoot);
@@ -62,7 +64,7 @@
 
             if (e.data.cmd === -1) {
                 document.getElementById('span').innerText += JSON.stringify(e.data);
-                iframe = document.getElementById('myid_iframe'); //Используйте refs, если вы используете React, Vue или другой подобный фреймворк https://vuejs.org/guide/essentials/template-refs.html
+                const iframe = document.getElementById('myid_iframe'); //Используйте refs, если вы используете React, Vue или другой подобный фреймворк https://vuejs.org/guide/essentials/template-refs.html
                 iframe.contentWindow.postMessage({cmd: 'open', config: {locale: 'ru'}}, '*');
             }
         });
