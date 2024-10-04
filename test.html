@@ -32,6 +32,19 @@
             })
         }
 
+        navigator.mediaDevices
+          .getUserMedia({
+              video: true
+          })
+          .then((stream) => {
+              console.log(stream)
+              /* use the stream */
+          })
+          .catch((err) => {
+              console.log(err)
+              /* handle the error */
+          });
+
         window.addEventListener('message', function (e) {
             console.log(e)
             // Ваша логика...
