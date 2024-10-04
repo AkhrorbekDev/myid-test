@@ -50,7 +50,7 @@
             });
 
         window.addEventListener('message', function (e) {
-            console.log('message', e)
+            console.log('message', e.data)
             // Ваша логика...
 
             if (e.data.cmd === -1) {
@@ -66,6 +66,7 @@
                     console.log('data', data)
                 }, creds: false, intro: false, locale: 'uz', nav: false, min: 1280
             })
+            iframe.contentWindow.postMessage({cmd: 'open', config: {locale: 'ru'}}, '*')
         })
         close.addEventListener('click', () => {
             window.MyID.close({
