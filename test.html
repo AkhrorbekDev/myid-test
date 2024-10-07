@@ -19,8 +19,11 @@
 
 <div style="position: relative">
 <!--    <img id="myImg" src="face-api/test/images/faces.jpg" alt="" />-->
-    <video id="myVideo" src="assets/media/video.mp4" autoplay muted onplay="onPlay(this)"></video>
-<!--    <video id="myVideo" autoplay muted></video>-->
+<!--    <video id="myVideo" src="assets/media/test-video.mp4" autoplay muted onplay="onPlay(this)"></video>-->
+    <video id="myVideo" controls loop muted onplay="onPlay(this)">
+        <source src="assets/media/test-video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
     <canvas id="overlay" style="position:absolute; inset: 0" width="710" height="473"></canvas>
 </div>
 
