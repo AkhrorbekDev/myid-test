@@ -3,75 +3,155 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script type="module" crossorigin src="myid_assets/index.js"></script>
+<!--    <script type="module" crossorigin src="myid_assets/index.js"></script>-->
 </head>
 <body>
-<iframe id="myid_iframe" src="https://docs.myid.uz/iframe/" allow="camera;fullscreen" allowfullscreen
-        border="0"></iframe>
+<!--<iframe id="myid_iframe" src="https://docs.myid.uz/iframe/" allow="camera;fullscreen" allowfullscreen-->
+<!--        border="0"></iframe>-->
 <!--<div id="myid_iframe"></div>-->
-<span id="span"> IFrame response </span>
+<!--<span id="span"> IFrame response </span>-->
 
-<button id="btn">test</button>
-<button id="close">close</button>
+<!--<button id="btn">test</button>-->
+<!--<button id="close">close</button>-->
 
+<!--<img src="face-api/test/images/faces.jpg" alt="" id="originalImg">-->
+<!--<canvas id="reflay" class="overlay"></canvas>-->
+
+<div style="position: relative">
+<!--    <img id="myImg" src="face-api/test/images/faces.jpg" alt="" />-->
+    <video id="myVideo" src="assets/media/video.mp4" autoplay muted onplay="onPlay(this)"></video>
+<!--    <video id="myVideo" autoplay muted></video>-->
+    <canvas id="overlay" style="position:absolute; inset: 0" width="710" height="473"></canvas>
+</div>
+
+<script src="face-api.js"></script>
 <script>
+const videoEl = document.getElementById('myVideo')
+// onPlay(videoEl)
 
-    // navigator.mediaDevices
-    //     .getUserMedia({
-    //         video: true,
-    //         camera: true
-    //     })
-    //     .then((stream) => {
-    //         console.log('stream', stream)
-    //         /* use the stream */
-    //     })
-    //     .catch((err) => {
-    //         console.log(err)
-    //         /* handle the error */
-    //     });
-    const myIDRoot = document.createElement('div');
-    const btn = document.getElementById('btn');
-    const close = document.getElementById('close');
-    myIDRoot.id = 'myid_window';
-    document.body.appendChild(myIDRoot);
-    const iframe = document.getElementById('myid_iframe'); //Используйте refs, если вы используете React, Vue или другой подобный фреймворк https://vuejs.org/guide/essentials/template-refs.html
-    const script = document.createElement('script')
-    script.src = 'myid_assets/index.js'
-    script.type = 'module'
-    script.crossOrigin = true
-    script.onload = () => {
-        console.log('script loaded!');
-        console.log('init', window.MyID);
-        console.log('myIDRoot', myIDRoot);
-        window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID
+navigator.mediaDevices.getUserMedia(
+  { video: {} },
+  stream => videoEl.srcObject = stream,
+  err => console.error(err)
+)
+
+async function onPlay (input) {
+    console.log('input', input);
+    console.log('faceapi', faceapi);
+    console.log('nets', faceapi.nets);
+
+    const MODEL_URL = '/assets/weights'
+
+    // await faceapi.loadSsdMobilenetv1Model(MODEL_URL)
+    // await faceapi.loadFaceLandmarkModel(MODEL_URL)
+    // await faceapi.loadFaceRecognitionModel(MODEL_URL)
+    await faceapi.loadMtcnnModel(MODEL_URL)
+    await faceapi.loadFaceRecognitionModel(MODEL_URL)
+
+    // await faceapi.nets.ssdMobilenetv1.loadFromUri('/assets/weights')
+    // const net = new faceapi.SsdMobilenetv1()
+    // await net.loadFromUri('/assets/weights')
+    // console.log('net', net);
+
+    // const input = document.getElementById('myVideo')
+    // const canvas = document.getElementById('overlay')
+
+    const mtcnnForwardParams = {
+        // number of scaled versions of the input image passed through the CNN
+        // of the first stage, lower numbers will result in lower inference time,
+        // but will also be less accurate
+        maxNumScales: 10,
+        // scale factor used to calculate the scale steps of the image
+        // pyramid used in stage 1
+        scaleFactor: 0.709,
+        // the score threshold values used to filter the bounding
+        // boxes of stage 1, 2 and 3
+        scoreThresholds: [0.6, 0.7, 0.7],
+        // mininum face size to expect, the higher the faster processing will be,
+        // but smaller faces won't be detected
+        minFaceSize: 20
     }
-    document.getElementsByTagName('head')[0].appendChild(script);
+
+    const mtcnnResults = await faceapi.mtcnn(input, mtcnnForwardParams)
+
+    faceapi.draw.drawDetections('overlay', mtcnnResults.map(res => res.detection), { withScore: false })
+    faceapi.draw.drawFaceLandmarks('overlay', mtcnnResults.map(res => res.landmarks), { lineWidth: 4, color: 'red' })
+
+    const options = new faceapi.MtcnnOptions(mtcnnForwardParams)
+    const fullFaceDescriptions = await faceapi.detectAllFaces(input, options).withFaceLandmarks().withFaceDescriptors()
+    console.log('fullFaceDescriptions', fullFaceDescriptions);
+
+    setTimeout(() => onPlay(input))
 
 
-    window.addEventListener('message', function (e) {
-        // Ваша логика...
-
-        if (e.data.cmd) {
-            document.getElementById('span').innerText = JSON.stringify(e.data);
-        }
-    });
-
-    btn.addEventListener('click', () => {
-        window.MyID.open({
-            callback: (data) => {
-                console.log(data)
-            }, creds: false, intro: true, locale: 'uz', nav: false, min: 1280
-        })
-    })
-    close.addEventListener('click', () => {
-        window.MyID.close()
-    })
-
-    //Например, кнопка "попробовать снова"
-    //         iframe.contentWindow.postMessage({cmd: 'open'}, '*'); //config сохраняется после первого запуска
-
+    /*****************************/
+    // let fullFaceDescriptions = await faceapi.detectAllFaces(input).withFaceLandmarks().withFaceDescriptors()
+    // console.log('fullFaceDescriptions', fullFaceDescriptions);
+    //
+    // faceapi.draw.drawDetections(canvas, fullFaceDescriptions)
+    // faceapi.draw.drawFaceLandmarks(canvas, fullFaceDescriptions)
+}
 
 </script>
+
+<!--<script>-->
+
+<!--// navigator.mediaDevices-->
+<!--    //     .getUserMedia({-->
+<!--    //         video: true,-->
+<!--    //         camera: true-->
+<!--    //     })-->
+<!--    //     .then((stream) => {-->
+<!--    //         console.log('stream', stream)-->
+<!--    //         /* use the stream */-->
+<!--    //     })-->
+<!--    //     .catch((err) => {-->
+<!--    //         console.log(err)-->
+<!--    //         /* handle the error */-->
+<!--    //     });-->
+<!--    // const myIDRoot = document.createElement('div');-->
+<!--    // const btn = document.getElementById('btn');-->
+<!--    // const close = document.getElementById('close');-->
+<!--    // myIDRoot.id = 'myid_window';-->
+<!--    // document.body.appendChild(myIDRoot);-->
+<!--    // const iframe = document.getElementById('myid_iframe'); //Используйте refs, если вы используете React, Vue или другой подобный фреймворк https://vuejs.org/guide/essentials/template-refs.html-->
+<!--    // const script = document.createElement('script')-->
+<!--    // script.src = 'myid_assets/index.js'-->
+<!--    // script.type = 'module'-->
+<!--    // script.crossOrigin = true-->
+<!--    // script.onload = () => {-->
+<!--    //     console.log('script loaded!');-->
+<!--    //     console.log('init', window.MyID);-->
+<!--    //     console.log('myIDRoot', myIDRoot);-->
+<!--    //     window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID-->
+<!--    // }-->
+<!--    // document.getElementsByTagName('head')[0].appendChild(script);-->
+<!--    //-->
+<!--    //-->
+<!--    // window.addEventListener('message', function (e) {-->
+<!--    //     // Ваша логика...-->
+<!--    //-->
+<!--    //     if (e.data.cmd) {-->
+<!--    //         document.getElementById('span').innerText = JSON.stringify(e.data);-->
+<!--    //     }-->
+<!--    // });-->
+<!--    //-->
+<!--    // btn.addEventListener('click', () => {-->
+<!--    //     window.MyID.open({-->
+<!--    //         callback: (data) => {-->
+<!--    //             console.log(data)-->
+<!--    //         }, creds: false, intro: true, locale: 'uz', nav: false, min: 1280-->
+<!--    //     })-->
+<!--    // })-->
+<!--    // close.addEventListener('click', () => {-->
+<!--    //     window.MyID.close()-->
+<!--    // })-->
+
+<!--    //Например, кнопка "попробовать снова"-->
+<!--    //         iframe.contentWindow.postMessage({cmd: 'open'}, '*'); //config сохраняется после первого запуска-->
+
+
+<!--</script>-->
 
 </body>
 </html>
