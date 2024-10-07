@@ -88,6 +88,7 @@ async function onPlay (input) {
     }
 
     const mtcnnResults = await faceapi.mtcnn(input, mtcnnForwardParams)
+    console.log('mtcnnResults', mtcnnResults);
 
     faceapi.draw.drawDetections('overlay', mtcnnResults.map(res => res.detection), { withScore: false })
     faceapi.draw.drawFaceLandmarks('overlay', mtcnnResults.map(res => res.landmarks), { lineWidth: 4, color: 'red' })
