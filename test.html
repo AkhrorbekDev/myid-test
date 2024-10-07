@@ -17,26 +17,38 @@
 <!--<img src="face-api/test/images/faces.jpg" alt="" id="originalImg">-->
 <!--<canvas id="reflay" class="overlay"></canvas>-->
 
-<div style="position: relative; width: 710px; height: 473px;">
+<div style="position: relative; width: 400px; height: 400px;">
 <!--    <img id="myImg" src="face-api/test/images/faces.jpg" alt="" />-->
+    <video id="myVideo" muted onplay="onPlay(this)"></video>
 <!--    <video id="myVideo" src="assets/media/test-video.mp4" autoplay muted onplay="onPlay(this)"></video>-->
-    <video id="myVideo" controls loop muted autoplay onplay="onPlay(this)">
-        <source src="assets/media/test-video.mp4" type="video/mp4">
-        Your browser does not support the video tag.
-    </video>
-    <canvas id="overlay" style="position:absolute; inset: 0" width="710" height="473"></canvas>
+<!--    <video id="myVideo" controls loop muted autoplay onplay="onPlay(this)">-->
+<!--        <source src="assets/media/test-video.mp4" type="video/mp4">-->
+<!--        Your browser does not support the video tag.-->
+<!--    </video>-->
+    <canvas id="overlay" style="position:absolute; inset: 0" width="400" height="400"></canvas>
 </div>
+
+<button id="btn" style="font-size: 24px; font-weight: 600; padding: 16px; width: 200px; border-radius: 12px">test</button>
 
 <script src="face-api.js"></script>
 <script>
 const videoEl = document.getElementById('myVideo')
 // onPlay(videoEl)
+const btn = document.getElementById('btn')
 
-navigator.mediaDevices.getUserMedia(
-  { video: {} },
-  stream => videoEl.srcObject = stream,
-  err => console.error(err)
-)
+btn.addEventListener('click', () => {
+    navigator.mediaDevices.getUserMedia({
+        video: true,
+        camera: true
+    }).then((stream) => {
+        console.log('stream', stream);
+        videoEl.srcObject = stream
+        videoEl.addEventListener('loadedmetadata', () => {
+            console.log('loadedmetadata');
+            videoEl.play();
+        });
+    })
+})
 
 async function onPlay (input) {
     console.log('input', input);
@@ -80,11 +92,19 @@ async function onPlay (input) {
     faceapi.draw.drawDetections('overlay', mtcnnResults.map(res => res.detection), { withScore: false })
     faceapi.draw.drawFaceLandmarks('overlay', mtcnnResults.map(res => res.landmarks), { lineWidth: 4, color: 'red' })
 
-    const options = new faceapi.MtcnnOptions(mtcnnForwardParams)
-    const fullFaceDescriptions = await faceapi.detectAllFaces(input, options).withFaceLandmarks().withFaceDescriptors()
-    console.log('fullFaceDescriptions', fullFaceDescriptions);
+    // const options = new faceapi.MtcnnOptions(mtcnnForwardParams)
+    // const fullFaceDescriptions = await faceapi.detectAllFaces(input, options).withFaceLandmarks().withFaceDescriptors()
+    // console.log('fullFaceDescriptions', fullFaceDescriptions);
 
-    setTimeout(() => onPlay(input))
+    // 0.6 is a good distance threshold value to judge
+    // whether the descriptors match or not
+    // const maxDescriptorDistance = 0.6
+    // const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, maxDescriptorDistance)
+    //
+    // const results = fullFaceDescriptions.map(fd => faceMatcher.findBestMatch(fd.descriptor))
+    // console.log('results', results);
+
+    // setTimeout(() => onPlay(input))
 
 
     /*****************************/
