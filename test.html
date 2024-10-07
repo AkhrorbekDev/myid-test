@@ -38,7 +38,8 @@ const btn = document.getElementById('btn')
 
 btn.addEventListener('click', () => {
     navigator.mediaDevices.getUserMedia({
-        video: true
+        video: true,
+        camera: true
     }).then((stream) => {
         console.log('stream', stream);
         videoEl.srcObject = stream
