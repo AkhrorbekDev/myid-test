@@ -61,7 +61,7 @@ async function onPlay (input) {
 
     const MODEL_URL = '/assets/weights'
 
-    await faceapi.tinyFaceDetector.loadFromUri(MODEL_URL)
+    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL)
 
     const faces = await faceapi.detectAllFaces(input, new faceapi.TinyFaceDetectorOptions());
     console.log('faces', faces);
