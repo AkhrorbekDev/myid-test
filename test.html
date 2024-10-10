@@ -3,62 +3,239 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-    <script type="module" crossorigin src="myid_assets/index.js"></script>
+<!--    <script type="module" crossorigin src="myid_assets/index.js"></script>-->
 </head>
 <body>
-<iframe id="myid_iframe" src="https://docs.myid.uz/iframe/" allow="camera;fullscreen" allowfullscreen
-        border="0"></iframe>
+<!--<iframe id="myid_iframe" src="https://docs.myid.uz/iframe/" allow="camera;fullscreen" allowfullscreen-->
+<!--        border="0"></iframe>-->
 <!--<div id="myid_iframe"></div>-->
-<span id="span"> IFrame response </span>
+<!--<span id="span"> IFrame response </span>-->
 
-<button id="btn">test</button>
-<button id="close">close</button>
+<!--<button id="btn">test</button>-->
+<!--<button id="close">close</button>-->
 
+<!--<img src="face-api/test/images/faces.jpg" alt="" id="originalImg">-->
+<!--<canvas id="reflay" class="overlay"></canvas>-->
+
+<video id="myVideo" muted onplay="onPlay(this)"></video>
+
+<!--<div style="position: relative; width: 400px; height: 400px;">-->
+<!--&lt;!&ndash;    <img id="myImg" src="face-api/test/images/faces.jpg" alt="" />&ndash;&gt;-->
+<!--    <video id="myVideo" muted onplay="onPlay(this)"></video>-->
+<!--&lt;!&ndash;    <video id="myVideo" src="assets/media/test-video.mp4" autoplay muted onplay="onPlay(this)"></video>&ndash;&gt;-->
+<!--&lt;!&ndash;    <video id="myVideo" controls loop muted autoplay onplay="onPlay(this)">&ndash;&gt;-->
+<!--&lt;!&ndash;        <source src="assets/media/test-video.mp4" type="video/mp4">&ndash;&gt;-->
+<!--&lt;!&ndash;        Your browser does not support the video tag.&ndash;&gt;-->
+<!--&lt;!&ndash;    </video>&ndash;&gt;-->
+<!--    <canvas id="overlay" style="position:absolute; inset: 0" width="400" height="400"></canvas>-->
+<!--</div>-->
+
+<button id="btn" style="font-size: 24px; font-weight: 600; padding: 16px; width: 200px; border-radius: 12px">test</button>
+
+<script src="face-api.js"></script>
 <script>
+const videoEl = document.getElementById('myVideo')
+// onPlay(videoEl)
+const btn = document.getElementById('btn')
 
-    const myIDRoot = document.createElement('div');
-    const btn = document.getElementById('btn');
-    const close = document.getElementById('close');
-    myIDRoot.id = 'myid_window';
-    document.body.appendChild(myIDRoot);
-    const iframe = document.getElementById('myid_iframe'); //Используйте refs, если вы используете React, Vue или другой подобный фреймворк https://vuejs.org/guide/essentials/template-refs.html
-    const script = document.createElement('script')
-    script.src = 'myid_assets/index.js'
-    script.type = 'module'
-    script.crossOrigin = true
-    script.onload = () => {
-        console.log('script loaded!');
-        console.log('init', window.MyID);
-        console.log('myIDRoot', myIDRoot);
-        window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID
-    }
-    document.getElementsByTagName('head')[0].appendChild(script);
-
-
-    window.addEventListener('message', function (e) {
-        // Ваша логика...
-
-        if (e.data.cmd) {
-            document.getElementById('span').innerText = JSON.stringify(e.data);
-        }
-    });
-
-    btn.addEventListener('click', () => {
-        window.MyID.open({
-            callback: (data) => {
-                console.log(data)
-            }, creds: false, intro: true, locale: 'uz', nav: false, min: 1280
-        })
+btn.addEventListener('click', () => {
+    navigator.mediaDevices.getUserMedia({
+        video: true,
+        camera: true
+    }).then((stream) => {
+        console.log('stream', stream);
+        videoEl.srcObject = stream
+        videoEl.addEventListener('loadedmetadata', () => {
+            console.log('loadedmetadata');
+            videoEl.play();
+        });
     })
-    close.addEventListener('click', () => {
-        window.MyID.close()
-    })
+})
 
-    //Например, кнопка "попробовать снова"
-    //         iframe.contentWindow.postMessage({cmd: 'open'}, '*'); //config сохраняется после первого запуска
+console.log('faceapi', faceapi);
+console.log('nets', faceapi.nets);
 
+async function onPlay (input) {
+    console.log('input', input);
+
+
+    const MODEL_URL = '/assets/weights'
+
+    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL)
+
+    const faces = await faceapi.detectAllFaces(input, new faceapi.TinyFaceDetectorOptions());
+    console.log('faces', faces);
+
+    const singleFace = await faceapi.detectSingleFace(input, new faceapi.TinyFaceDetectorOptions());
+    console.log('singleFace', singleFace);
+
+//     const box = {
+//         // Set boundaries to their inverse infinity, so any number is greater/smaller
+//         bottom: -Infinity,
+//         left: Infinity,
+//         right: -Infinity,
+//         top: Infinity,
+//
+//         // Given the boundaries, we can compute width and height
+//         get height() {
+//             return this.bottom - this.top;
+//         },
+//
+//         get width() {
+//             return this.right - this.left;
+//         },
+//     };
+//
+// // Update the box boundaries
+//     for (const face of faces) {
+//         console.log('face', face);
+//         box.bottom = Math.max(box.bottom, face.box.bottom);
+//         box.left = Math.min(box.left, face.box.left);
+//         box.right = Math.max(box.right, face.box.right);
+//         box.top = Math.min(box.top, face.box.top);
+//     }
+//
+//     const canvas = document.createElement('canvas');
+//     const context = canvas.getContext('2d');
+//
+//     canvas.height = box.height;
+//     canvas.width = box.width;
+//
+//     context.drawImage(
+//       input,
+//       box.left,
+//       box.top,
+//       box.width,
+//       box.height,
+//       0,
+//       0,
+//       canvas.width,
+//       canvas.height
+//     );
+
+
+    /* TEST start */
+    // await faceapi.loadMtcnnModel(MODEL_URL)
+    // await faceapi.loadFaceRecognitionModel(MODEL_URL)
+    //
+    // const mtcnnForwardParams = {
+    //     // number of scaled versions of the input image passed through the CNN
+    //     // of the first stage, lower numbers will result in lower inference time,
+    //     // but will also be less accurate
+    //     maxNumScales: 10,
+    //     // scale factor used to calculate the scale steps of the image
+    //     // pyramid used in stage 1
+    //     scaleFactor: 0.709,
+    //     // the score threshold values used to filter the bounding
+    //     // boxes of stage 1, 2 and 3
+    //     scoreThresholds: [0.6, 0.7, 0.7],
+    //     // mininum face size to expect, the higher the faster processing will be,
+    //     // but smaller faces won't be detected
+    //     minFaceSize: 20
+    // }
+    //
+    // const mtcnnResults = await faceapi.mtcnn(input, mtcnnForwardParams)
+    // console.log('mtcnnResults', mtcnnResults);
+    //
+    // faceapi.draw.drawDetections('overlay', mtcnnResults.map(res => res.detection), { withScore: false })
+    // faceapi.draw.drawFaceLandmarks('overlay', mtcnnResults.map(res => res.landmarks), { lineWidth: 4, color: 'red' })
+    /* TEST end */
+
+    // await faceapi.loadSsdMobilenetv1Model(MODEL_URL)
+    // await faceapi.loadFaceLandmarkModel(MODEL_URL)
+    // await faceapi.loadFaceRecognitionModel(MODEL_URL)
+
+    // await faceapi.nets.ssdMobilenetv1.loadFromUri('/assets/weights')
+    // const net = new faceapi.SsdMobilenetv1()
+    // await net.loadFromUri('/assets/weights')
+    // console.log('net', net);
+
+    // const input = document.getElementById('myVideo')
+    // const canvas = document.getElementById('overlay')
+
+    // const options = new faceapi.MtcnnOptions(mtcnnForwardParams)
+    // const fullFaceDescriptions = await faceapi.detectAllFaces(input, options).withFaceLandmarks().withFaceDescriptors()
+    // console.log('fullFaceDescriptions', fullFaceDescriptions);
+
+    // 0.6 is a good distance threshold value to judge
+    // whether the descriptors match or not
+    // const maxDescriptorDistance = 0.6
+    // const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, maxDescriptorDistance)
+    //
+    // const results = fullFaceDescriptions.map(fd => faceMatcher.findBestMatch(fd.descriptor))
+    // console.log('results', results);
+
+    // setTimeout(() => onPlay(input))
+
+
+    /*****************************/
+    // let fullFaceDescriptions = await faceapi.detectAllFaces(input).withFaceLandmarks().withFaceDescriptors()
+    // console.log('fullFaceDescriptions', fullFaceDescriptions);
+    //
+    // faceapi.draw.drawDetections(canvas, fullFaceDescriptions)
+    // faceapi.draw.drawFaceLandmarks(canvas, fullFaceDescriptions)
+}
 
 </script>
+
+<!--<script>-->
+
+<!--// navigator.mediaDevices-->
+<!--    //     .getUserMedia({-->
+<!--    //         video: true,-->
+<!--    //         camera: true-->
+<!--    //     })-->
+<!--    //     .then((stream) => {-->
+<!--    //         console.log('stream', stream)-->
+<!--    //         /* use the stream */-->
+<!--    //     })-->
+<!--    //     .catch((err) => {-->
+<!--    //         console.log(err)-->
+<!--    //         /* handle the error */-->
+<!--    //     });-->
+<!--    // const myIDRoot = document.createElement('div');-->
+<!--    // const btn = document.getElementById('btn');-->
+<!--    // const close = document.getElementById('close');-->
+<!--    // myIDRoot.id = 'myid_window';-->
+<!--    // document.body.appendChild(myIDRoot);-->
+<!--    // const iframe = document.getElementById('myid_iframe'); //Используйте refs, если вы используете React, Vue или другой подобный фреймворк https://vuejs.org/guide/essentials/template-refs.html-->
+<!--    // const script = document.createElement('script')-->
+<!--    // script.src = 'myid_assets/index.js'-->
+<!--    // script.type = 'module'-->
+<!--    // script.crossOrigin = true-->
+<!--    // script.onload = () => {-->
+<!--    //     console.log('script loaded!');-->
+<!--    //     console.log('init', window.MyID);-->
+<!--    //     console.log('myIDRoot', myIDRoot);-->
+<!--    //     window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID-->
+<!--    // }-->
+<!--    // document.getElementsByTagName('head')[0].appendChild(script);-->
+<!--    //-->
+<!--    //-->
+<!--    // window.addEventListener('message', function (e) {-->
+<!--    //     // Ваша логика...-->
+<!--    //-->
+<!--    //     if (e.data.cmd) {-->
+<!--    //         document.getElementById('span').innerText = JSON.stringify(e.data);-->
+<!--    //     }-->
+<!--    // });-->
+<!--    //-->
+<!--    // btn.addEventListener('click', () => {-->
+<!--    //     window.MyID.open({-->
+<!--    //         callback: (data) => {-->
+<!--    //             console.log(data)-->
+<!--    //         }, creds: false, intro: true, locale: 'uz', nav: false, min: 1280-->
+<!--    //     })-->
+<!--    // })-->
+<!--    // close.addEventListener('click', () => {-->
+<!--    //     window.MyID.close()-->
+<!--    // })-->
+
+<!--    //Например, кнопка "попробовать снова"-->
+<!--    //         iframe.contentWindow.postMessage({cmd: 'open'}, '*'); //config сохраняется после первого запуска-->
+
+
+<!--</script>-->
 
 </body>
 </html>
