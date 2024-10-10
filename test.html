@@ -69,49 +69,49 @@ async function onPlay (input) {
     const singleFace = await faceapi.detectSingleFace(input, new faceapi.TinyFaceDetectorOptions());
     console.log('singleFace', singleFace);
 
-    const box = {
-        // Set boundaries to their inverse infinity, so any number is greater/smaller
-        bottom: -Infinity,
-        left: Infinity,
-        right: -Infinity,
-        top: Infinity,
-
-        // Given the boundaries, we can compute width and height
-        get height() {
-            return this.bottom - this.top;
-        },
-
-        get width() {
-            return this.right - this.left;
-        },
-    };
-
-// Update the box boundaries
-    for (const face of faces) {
-        console.log('face', face);
-        box.bottom = Math.max(box.bottom, face.box.bottom);
-        box.left = Math.min(box.left, face.box.left);
-        box.right = Math.max(box.right, face.box.right);
-        box.top = Math.min(box.top, face.box.top);
-    }
-
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
-
-    canvas.height = box.height;
-    canvas.width = box.width;
-
-    context.drawImage(
-      input,
-      box.left,
-      box.top,
-      box.width,
-      box.height,
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
+//     const box = {
+//         // Set boundaries to their inverse infinity, so any number is greater/smaller
+//         bottom: -Infinity,
+//         left: Infinity,
+//         right: -Infinity,
+//         top: Infinity,
+//
+//         // Given the boundaries, we can compute width and height
+//         get height() {
+//             return this.bottom - this.top;
+//         },
+//
+//         get width() {
+//             return this.right - this.left;
+//         },
+//     };
+//
+// // Update the box boundaries
+//     for (const face of faces) {
+//         console.log('face', face);
+//         box.bottom = Math.max(box.bottom, face.box.bottom);
+//         box.left = Math.min(box.left, face.box.left);
+//         box.right = Math.max(box.right, face.box.right);
+//         box.top = Math.min(box.top, face.box.top);
+//     }
+//
+//     const canvas = document.createElement('canvas');
+//     const context = canvas.getContext('2d');
+//
+//     canvas.height = box.height;
+//     canvas.width = box.width;
+//
+//     context.drawImage(
+//       input,
+//       box.left,
+//       box.top,
+//       box.width,
+//       box.height,
+//       0,
+//       0,
+//       canvas.width,
+//       canvas.height
+//     );
 
 
     /* TEST start */
