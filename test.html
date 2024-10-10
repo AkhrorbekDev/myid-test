@@ -92,7 +92,7 @@ async function onPlay (input) {
         lineWidth: 2
     }
     const drawBox = new faceapi.draw.DrawBox(box, drawOptions)
-    drawBox.draw(document.getElementById('myCanvas'))
+    drawBox.draw(canvas)
 
 
     const MODEL_URL = '/assets/weights'
