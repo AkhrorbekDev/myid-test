@@ -95,6 +95,14 @@ async function onPlay (input) {
     const drawBox = new faceapi.draw.DrawBox(box, drawOptions)
     drawBox.draw(canvas)
 
+    const regionsToExtract = [
+        new faceapi.Rect(w_width * 0.2, v_height * 0.2, w_width * 0.6, v_height * 0.6)
+    ]
+// actually extractFaces is meant to extract face regions from bounding boxes
+// but you can also use it to extract any other region
+    const canvases = await faceapi.extractFaces(input, regionsToExtract)
+    console.log('EXTRACT', canvases);
+
 
     const MODEL_URL = '/assets/weights'
 
