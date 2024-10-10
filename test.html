@@ -66,6 +66,9 @@ async function onPlay (input) {
     const faces = await faceapi.detectAllFaces(input, new faceapi.TinyFaceDetectorOptions());
     console.log('faces', faces);
 
+    const singleFace = await faceapi.detectSingleFace(input, new faceapi.TinyFaceDetectorOptions());
+    console.log('singleFace', singleFace);
+
     const box = {
         // Set boundaries to their inverse infinity, so any number is greater/smaller
         bottom: -Infinity,
