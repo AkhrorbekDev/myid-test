@@ -112,7 +112,7 @@ async function onPlay (input) {
     // const faces = await faceapi.detectAllFaces(input, new faceapi.TinyFaceDetectorOptions());
     // console.log('faces', faces);
 
-    const singleFace = await faceapi.detectSingleFace(input, new faceapi.TinyFaceDetectorOptions({minFaceSize: 200}));
+    const singleFace = await faceapi.detectSingleFace(input, new faceapi.TinyFaceDetectorOptions({minFaceSize: v_height * 0.5, box: drawBox}));
     // const singleFace = await faceapi.detectSingleFace(input, {minFaceSize: 200});
     console.log('singleFace', singleFace);
 
