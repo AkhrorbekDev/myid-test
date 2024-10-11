@@ -75,8 +75,13 @@ async function onPlay (input) {
     console.log('w_width', w_width);
     console.log('v_height', v_height);
 
-    const box_x = w_width * 0.2
-    const box_y = v_height * 0.2
+    // const box_x = w_width * 0.2
+    // const box_y = v_height * 0.2
+    // const box_w = w_width * 0.6
+    // const box_h = v_height * 0.6
+
+    const box_x = 15
+    const box_y = 30
     const box_w = w_width * 0.6
     const box_h = v_height * 0.6
 
@@ -102,7 +107,7 @@ async function onPlay (input) {
     drawBox.draw(canvas)
 
     const regionsToExtract = [
-        new faceapi.Rect(w_width * 0.2, v_height * 0.2, w_width * 0.6, v_height * 0.6)
+        new faceapi.Rect(box_x, box_y, box_w, box_h)
     ]
 // actually extractFaces is meant to extract face regions from bounding boxes
 // but you can also use it to extract any other region
