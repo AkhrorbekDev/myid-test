@@ -75,11 +75,16 @@ async function onPlay (input) {
     console.log('w_width', w_width);
     console.log('v_height', v_height);
 
+    const box_x = w_width * 0.2
+    const box_y = v_height * 0.2
+    const box_w = w_width * 0.6
+    const box_h = v_height * 0.6
+
     const box = {
-        x: w_width * 0.2,
-        y: v_height * 0.2,
-        width: w_width * 0.6,
-        height: v_height * 0.6
+        x: box_x,
+        y: box_y,
+        width: box_w,
+        height: box_h
     }
     // const box = {
     //     x: 100,
@@ -112,9 +117,13 @@ async function onPlay (input) {
     // const faces = await faceapi.detectAllFaces(input, new faceapi.TinyFaceDetectorOptions());
     // console.log('faces', faces);
 
-    const singleFace = await faceapi.detectSingleFace(input, new faceapi.TinyFaceDetectorOptions({minFaceSize: v_height * 0.5, box: drawBox}));
+    const singleFace = await faceapi.detectSingleFace(input, new faceapi.TinyFaceDetectorOptions({minFaceSize: v_height * 0.5}));
     // const singleFace = await faceapi.detectSingleFace(input, {minFaceSize: 200});
     console.log('singleFace', singleFace);
+
+    if (singleFace?.box?.x >= box_x && singleFace?.box?.y >= box_y && singleFace?.box?.bottomRight?.x <= (box_x + box_w) && singleFace?.box?.bottomRight?.y <= (box_y + box_h)) {
+        console.log('singleFace--DETECT', singleFace);
+    }
 
     setTimeout(() => onPlay(input))
 
