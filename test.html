@@ -4,6 +4,33 @@
     <meta charset="UTF-8">
     <title>Title</title>
 <!--    <script type="module" crossorigin src="myid_assets/index.js"></script>-->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            /*justify-content: center;*/
+            /*align-items: center;*/
+        }
+
+        canvas {
+            position: absolute;
+        }
+
+        #box {
+            width: 450px;
+            height: 325px;
+            position: absolute;
+            /*background-image: url("paper.png");*/
+            /*background-image: url("assets/images/white.png");*/
+            background-repeat: no-repeat;
+            background-size: 450px 325px;
+        }
+    </style>
 </head>
 <body style="padding: 0; margin: 0;">
 <!--<iframe id="myid_iframe" src="https://docs.myid.uz/iframe/" allow="camera;fullscreen" allowfullscreen-->
@@ -11,135 +38,341 @@
 <!--<div id="myid_iframe"></div>-->
 <!--<span id="span"> IFrame response </span>-->
 
-<!--<button id="btn">test</button>-->
-<!--<button id="close">close</button>-->
 
-<!--<img src="face-api/test/images/faces.jpg" alt="" id="originalImg">-->
-<!--<canvas id="reflay" class="overlay"></canvas>-->
+<!--<div style="position:relative;">-->
+<!--    <video id="myVideo" muted style="width: 100vw; height: auto;" onplay="onPlay(this)"></video>-->
+<!--    <canvas id="myCanvas" style="position: absolute; inset: 0"></canvas>-->
+<!--</div>-->
+<!--<button id="btn" style="font-size: 24px; font-weight: 600; padding: 16px; width: 200px; border-radius: 12px">test</button>-->
 
-<div style="position:relative;">
-    <video id="myVideo" muted style="width: 100vw; height: auto;" onplay="onPlay(this)"></video>
-    <canvas id="myCanvas" style="position: absolute; inset: 0"></canvas>
-</div>
 
+<!--<div id="box"></div>-->
+<!--<video id="myVideo" width="500" height="375" autoplay muted onplay="onPlay(this)"></video>-->
+<video id="myVideo" autoplay muted onplay="onPlay(this)"></video>
+<canvas id="canvasBox" style="position: absolute; inset: 0;"></canvas>
+<!--<video id="myVideo" autoplay muted style="width: 100vw; height: auto;" onplay="onPlay(this)"></video>-->
 <button id="btn" style="font-size: 24px; font-weight: 600; padding: 16px; width: 200px; border-radius: 12px">test</button>
-
-<!--<script></script>-->
-
+<!--</body>-->
+<!--<br/>-->
 
 <script src="face-api.js"></script>
 <script>
-const videoEl = document.getElementById('myVideo')
-// onPlay(videoEl)
+const video = document.getElementById('myVideo')
+const canvasBox = document.getElementById('canvasBox')
+// video.height = window.innerHeight * 0.8
+video.width = window.innerWidth
+// video.style.height = `${window.innerHeight * 0.8}px`
+video.style.height = 'auto'
+video.style.width = `${window.innerWidth}px`
+
 const btn = document.getElementById('btn')
-const canvas = document.getElementById('myCanvas')
 
 btn.addEventListener('click', () => {
     navigator.mediaDevices.getUserMedia({
         video: true,
         camera: true
     }).then((stream) => {
-        console.log('stream', stream);
-        videoEl.srcObject = stream
-        videoEl.addEventListener('loadedmetadata', () => {
+        video.srcObject = stream
+        video.addEventListener('loadedmetadata', () => {
             console.log('loadedmetadata');
-            videoEl.play();
+            video.play();
         });
     })
 })
 
-console.log('faceapi', faceapi);
-console.log('nets', faceapi.nets);
-console.log('options', new faceapi.TinyFaceDetectorOptions());
+// Promise.all([
+//     faceapi.nets.tinyFaceDetector.loadFromUri('/assets/weights'),
+//     faceapi.nets.faceLandmark68Net.loadFromUri('/assets/weights'),
+//     faceapi.nets.faceRecognitionNet.loadFromUri('/assets/weights'),
+//     faceapi.nets.faceExpressionNet.loadFromUri('/assets/weights')
+// ]).then(startVideo)
+//
+// function startVideo() {
+//     navigator.mediaDevices.getUserMedia({
+//         video: true,
+//         camera: true
+//     }).then((stream) => {
+//         video.srcObject = stream
+//         // video.addEventListener('loadedmetadata', () => {
+//         //     console.log('loadedmetadata');
+//         //     video.play();
+//         // });
+//     })
+// }
 
-async function onPlay (input) {
-    console.log('input', input);
+async function onPlay () {
+    const v_width = video.width
+    const v_height = video.offsetHeight
 
-    const w_width = window.innerWidth
-    const v_height = videoEl.getBoundingClientRect().height
+    canvasBox.height = v_height;
+    canvasBox.width = v_width;
 
-    // const canvas = document.createElement('canvas');
-    // const context = canvas.getContext('2d');
-
-    canvas.height = v_height;
-    canvas.width = w_width;
-
-    console.log('w_width', w_width);
+    console.log('v_width', v_width);
     console.log('v_height', v_height);
 
-    // const box_x = w_width * 0.2
-    // const box_y = v_height * 0.2
-    // const box_w = w_width * 0.6
-    // const box_h = v_height * 0.6
-
-    const box_x = 15
-    const box_y = 30
-    const box_w = w_width * 0.6
+    const box_x = v_width * 0.2
+    const box_y = v_height * 0.2
+    const box_w = v_width * 0.6
     const box_h = v_height * 0.6
 
-//     const box = {
-//         x: box_x,
-//         y: box_y,
-//         width: box_w,
-//         height: box_h
-//     }
-//     console.log('box', box);
-// // see DrawBoxOptions below
-//     const drawOptions = {
-//         label: 'Hello I am a box!',
-//         lineWidth: 2
-//     }
-//     const drawBox = new faceapi.draw.DrawBox(box, drawOptions)
-//     drawBox.draw(canvas)
-
+    const box = {
+        x: box_x,
+        y: box_y,
+        width: box_w,
+        height: box_h
+    }
+    console.log('box', box);
+    // see DrawBoxOptions below
+    const drawOptions = {
+        label: 'Hello I am a box!',
+        lineWidth: 2
+    }
+    const drawBox = new faceapi.draw.DrawBox(box, drawOptions)
+    drawBox.draw(canvasBox)
 
     const MODEL_URL = '/assets/weights'
 
     await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL)
+    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)
+    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
+    await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL)
 
-    // const faces = await faceapi.detectAllFaces(input, new faceapi.TinyFaceDetectorOptions());
-    // console.log('faces', faces);
+    const canvas = faceapi.createCanvasFromMedia(video)
+    document.body.append(canvas)
+    const displaySize = { width: video.width, height: video.offsetHeight }
+    faceapi.matchDimensions(canvas, displaySize)
+    setInterval(async () => {
+        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
+        const count = await faceapi
+          .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
+          .withFaceLandmarks()
+        console.log('count', count);
+        if(count.length>1){
+            alert("There are multiple faces in the frame. Please keep only one face");
+        }
+        else{
+            const resizedDetections = faceapi.resizeResults(detections, displaySize)
+            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
+            console.log('resizedDetections', resizedDetections);
+            faceapi.draw.drawDetections(canvas, resizedDetections)
+            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
+            faceapi.draw.drawFaceExpressions(canvas, resizedDetections)
+            // const landmarks = await faceapi.detectFaceLandmarks(video)
+            // const mouth = landmarks.getMouth()
+            // const nose = landmarks.getNose()
+            // const leftEye = landmarks.getLeftEye();
+            // console.log('mouth', mouth[0]._x, mouth[0]._y);
+            // console.log('nose', nose[0]._x, nose[0]._y)
+            // console.log('leftEye', leftEye[0]._x, leftEye[0]._y)
+            // if((((mouth[0]._x<=330) && (mouth[0]._x>=280)) && ((mouth[0]._y<=310) && (mouth[0]._y>=260))) &&
+            //   (((nose[0]._x<=320) && (nose[0]._x>=270)) && ((nose[0]._y<=220) && (nose[0]._y>=160))) &&
+            //   (((leftEye[0]._x<=270) && (leftEye[0]._x>=210)) && ((leftEye[0]._y<=240) && (leftEye[0]._y>=180))))
+            // {
+            //     alert("Click for perfect photo");
+            // }
+            // else{
+            //     // alert("Image not ready");
+            // }
 
-    const singleFace = await faceapi.detectSingleFace(input, new faceapi.TinyFaceDetectorOptions({minFaceSize: v_height * 0.5}));
-    // const singleFace = await faceapi.detectSingleFace(input, {minFaceSize: 200});
-    console.log('singleFace', singleFace);
-    console.log('singleFace--test', singleFace?.box?.x >= box_x && singleFace?.box?.y >= box_y && singleFace?.box?.bottomRight?.x <= (box_x + box_w) && singleFace?.box?.bottomRight?.y <= (box_y + box_h));
+            const frame_height = resizedDetections[0].detection._box._height
+            const frame_width = resizedDetections[0].detection._box._width
+            const frame_x = resizedDetections[0].detection._box._x
+            const frame_y = resizedDetections[0].detection._box._y
+            const frame_br_x = resizedDetections[0].detection._box.bottomRight._x
+            const frame_br_y = resizedDetections[0].detection._box.bottomRight._y
 
-    if (singleFace?.box?.x >= box_x && singleFace?.box?.y >= box_y && singleFace?.box?.bottomRight?.x <= (box_x + box_w) && singleFace?.box?.bottomRight?.y <= (box_y + box_h)) {
-        console.log('singleFace--DETECT', singleFace);
+            if (box_x <= frame_x && box_y <= frame_y && (box_x + box_w) >= frame_br_x && (box_y + box_h) >= frame_br_y) {
+                console.log('SUCCESS!!!');
+                alert('success')
+            } else {
+                console.log('FAIL');
+            }
+
+        }
+    }, 100)
+
+    const Qe = aa("")
+    const Ht = aa({id: "", date: "", enabled: !1, nav: !0, min: 480})
+    const Cr = aa(r => {})
+    const Yn = aa("en")
+    const yt = {NODATA: 1, NOFACE: 16, TWOFACE: 256, TOOFAR: 4096, TOONEAR: 65536, NOTSTRAIGHT: 1048576}
+    const ut = {IDLE: 0, SUCCESS: 1, COUNTING: 2, NOT_READY: -1, ERROR: -2}
+    const An = {}
+    An[yt.NODATA] = "Loading...";
+    An[yt.NOFACE] = "No faces detected.";
+    An[yt.TWOFACE] = "Please exclude other faces from the frame.";
+    An[yt.TOOFAR] = "Please come closer to the camera.";
+    An[yt.TOONEAR] = "Please lean away from the camera.";
+    An[yt.NOTSTRAIGHT] = "Look straight into the camera, please.";
+
+    function Bo(r, t, e) {
+        return (e - r) / (t - r);
     }
 
-    setTimeout(() => onPlay(input), 2000)
+    function Ta(r, t) {
+        return { _x: Bo(0, t.width, r._x), _y: Bo(0, t.height, r._y) };
+    }
 
-    /* TEST start */
-    // await faceapi.loadMtcnnModel(MODEL_URL)
-    // await faceapi.loadFaceRecognitionModel(MODEL_URL)
-    //
-    // const mtcnnForwardParams = {
-    //     // number of scaled versions of the input image passed through the CNN
-    //     // of the first stage, lower numbers will result in lower inference time,
-    //     // but will also be less accurate
-    //     maxNumScales: 10,
-    //     // scale factor used to calculate the scale steps of the image
-    //     // pyramid used in stage 1
-    //     scaleFactor: 0.709,
-    //     // the score threshold values used to filter the bounding
-    //     // boxes of stage 1, 2 and 3
-    //     scoreThresholds: [0.6, 0.7, 0.7],
-    //     // mininum face size to expect, the higher the faster processing will be,
-    //     // but smaller faces won't be detected
-    //     minFaceSize: 20
-    // }
-    //
-    // const mtcnnResults = await faceapi.mtcnn(input, mtcnnForwardParams)
-    // console.log('mtcnnResults', mtcnnResults);
-    //
-    // faceapi.draw.drawDetections('overlay', mtcnnResults.map(res => res.detection), { withScore: false })
-    // faceapi.draw.drawFaceLandmarks('overlay', mtcnnResults.map(res => res.landmarks), { lineWidth: 4, color: 'red' })
-    /* TEST end */
+    const Tr = {
+        position: (r, t) => {
+            let e = r.alignedRect._box._x + r.alignedRect._box._width / 2, n = t.width / 2,
+              o = r.alignedRect._box._y + r.alignedRect._box._height / 2, a = t.height / 2,
+              i = Math.min(t.width, t.height);
+            return Math.abs(e - n) > i / 7 || Math.abs(o - a) > i / 7 ? -1 : 0
+        },
+        size: (r, t) => r.alignedRect._box._height / t.height < .4 ? -1 : r.alignedRect._box._height / t.height > .7 ? 1 : 0,
+        pan: (r, t) => {
+            const e = Ta(r.landmarks._positions[0], t), n = Ta(r.landmarks._positions[16], t),
+              o = Ta(r.landmarks._positions[30], t), a = .2;
+            return Bo(e._x, n._x, o._x) > .5 + a ? 1 : Bo(e._x, n._x, o._x) < .5 - a ? -1 : 0
+        }
+    };
+
+    function y1(r, t, e) {
+        let c, l, h, v = {};
+
+        let E = yt.NODATA, I = [];
+
+        function R(P) {
+            if (!c || !l || !h) return;
+            if (I.push(P), I.length > m1 && I.shift(), I.reduce((j, te) => j + te.length, 0) < 1) {
+                return e(0, E = yt.NOFACE);
+            }
+            const H = P[0];
+            if (!!H) {
+                if (e(5, h.ctx.fillStyle = "magenta", h), h.ctx.clearRect(0, 0, v.width, v.height), H.landmarks._positions.forEach((j, te) => {
+                    h.ctx.fillRect(j._x - 1, j._y - 1, 2, 2)
+                }), P.length > 1) {
+                    return e(0, E = yt.TWOFACE);
+                }
+                if (Tr.size(H, v) < 0) {
+                    return e(0, E = yt.TOOFAR);
+                }
+                if (Tr.size(H, v) > 0) {
+                    return e(0, E = yt.TOONEAR);
+                }
+                if (Tr.pan(H, v) > 0 || Tr.pan(H, v) < 0 || Tr.position(H, v) < 0) {
+                    return e(0, E = yt.NOTSTRAIGHT);
+                }
+                e(0, E = 0), H.alignedRect._box
+            }
+        }
+    }
+
+
 }
-
 </script>
+<!--<script>-->
+<!--const videoEl = document.getElementById('myVideo')-->
+<!--// onPlay(videoEl)-->
+<!--const btn = document.getElementById('btn')-->
+<!--const canvas = document.getElementById('myCanvas')-->
+
+<!--btn.addEventListener('click', () => {-->
+<!--    navigator.mediaDevices.getUserMedia({-->
+<!--        video: true,-->
+<!--        camera: true-->
+<!--    }).then((stream) => {-->
+<!--        console.log('stream', stream);-->
+<!--        videoEl.srcObject = stream-->
+<!--        videoEl.addEventListener('loadedmetadata', () => {-->
+<!--            console.log('loadedmetadata');-->
+<!--            videoEl.play();-->
+<!--        });-->
+<!--    })-->
+<!--})-->
+
+<!--console.log('faceapi', faceapi);-->
+<!--console.log('nets', faceapi.nets);-->
+
+<!--async function onPlay (input) {-->
+<!--    console.log('input', input);-->
+
+<!--    const w_width = window.innerWidth-->
+<!--    const v_height = videoEl.getBoundingClientRect().height-->
+
+<!--    // const canvas = document.createElement('canvas');-->
+<!--    // const context = canvas.getContext('2d');-->
+
+<!--    canvas.height = v_height;-->
+<!--    canvas.width = w_width;-->
+
+<!--    console.log('w_width', w_width);-->
+<!--    console.log('v_height', v_height);-->
+
+<!--    const box_x = w_width * 0.2-->
+<!--    const box_y = v_height * 0.2-->
+<!--    const box_w = w_width * 0.6-->
+<!--    const box_h = v_height * 0.6-->
+
+<!--    // const box_x = 15-->
+<!--    // const box_y = 30-->
+<!--    // const box_w = w_width * 0.6-->
+<!--    // const box_h = v_height * 0.6-->
+
+<!--    const box = {-->
+<!--        x: box_x,-->
+<!--        y: box_y,-->
+<!--        width: box_w,-->
+<!--        height: box_h-->
+<!--    }-->
+<!--    console.log('box', box);-->
+<!--// see DrawBoxOptions below-->
+<!--    const drawOptions = {-->
+<!--        label: 'Hello I am a box!',-->
+<!--        lineWidth: 2-->
+<!--    }-->
+<!--    const drawBox = new faceapi.draw.DrawBox(box, drawOptions)-->
+<!--    drawBox.draw(canvas)-->
+
+
+<!--    const MODEL_URL = '/assets/weights'-->
+
+<!--    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL)-->
+
+<!--    // const faces = await faceapi.detectAllFaces(input, new faceapi.TinyFaceDetectorOptions());-->
+<!--    // console.log('faces', faces);-->
+
+<!--    const singleFace = await faceapi.detectSingleFace(input, new faceapi.TinyFaceDetectorOptions({minFaceSize: v_height * 0.5}));-->
+<!--    // const singleFace = await faceapi.detectSingleFace(input, {minFaceSize: 200});-->
+<!--    console.log('singleFace', singleFace);-->
+<!--    console.log('singleFace&#45;&#45;test', singleFace?.box?.x >= box_x && singleFace?.box?.y >= box_y && singleFace?.box?.bottomRight?.x <= (box_x + box_w) && singleFace?.box?.bottomRight?.y <= (box_y + box_h));-->
+
+<!--    if (singleFace?.box?.x >= box_x && singleFace?.box?.y >= box_y && singleFace?.box?.bottomRight?.x <= (box_x + box_w) && singleFace?.box?.bottomRight?.y <= (box_y + box_h)) {-->
+<!--        console.log('singleFace&#45;&#45;DETECT', singleFace);-->
+<!--    }-->
+
+<!--    setTimeout(() => onPlay(input), 2000)-->
+
+<!--    /* TEST start */-->
+<!--    // await faceapi.loadMtcnnModel(MODEL_URL)-->
+<!--    // await faceapi.loadFaceRecognitionModel(MODEL_URL)-->
+<!--    //-->
+<!--    // const mtcnnForwardParams = {-->
+<!--    //     // number of scaled versions of the input image passed through the CNN-->
+<!--    //     // of the first stage, lower numbers will result in lower inference time,-->
+<!--    //     // but will also be less accurate-->
+<!--    //     maxNumScales: 10,-->
+<!--    //     // scale factor used to calculate the scale steps of the image-->
+<!--    //     // pyramid used in stage 1-->
+<!--    //     scaleFactor: 0.709,-->
+<!--    //     // the score threshold values used to filter the bounding-->
+<!--    //     // boxes of stage 1, 2 and 3-->
+<!--    //     scoreThresholds: [0.6, 0.7, 0.7],-->
+<!--    //     // mininum face size to expect, the higher the faster processing will be,-->
+<!--    //     // but smaller faces won't be detected-->
+<!--    //     minFaceSize: 20-->
+<!--    // }-->
+<!--    //-->
+<!--    // const mtcnnResults = await faceapi.mtcnn(input, mtcnnForwardParams)-->
+<!--    // console.log('mtcnnResults', mtcnnResults);-->
+<!--    //-->
+<!--    // faceapi.draw.drawDetections('overlay', mtcnnResults.map(res => res.detection), { withScore: false })-->
+<!--    // faceapi.draw.drawFaceLandmarks('overlay', mtcnnResults.map(res => res.landmarks), { lineWidth: 4, color: 'red' })-->
+<!--    /* TEST end */-->
+<!--}-->
+
+<!--</script>-->
 
 <!--<script>-->
 
