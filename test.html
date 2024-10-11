@@ -22,18 +22,10 @@
     <canvas id="myCanvas" style="position: absolute; inset: 0"></canvas>
 </div>
 
-<!--<div style="position: relative; width: 400px; height: 400px;">-->
-<!--&lt;!&ndash;    <img id="myImg" src="face-api/test/images/faces.jpg" alt="" />&ndash;&gt;-->
-<!--    <video id="myVideo" muted onplay="onPlay(this)"></video>-->
-<!--&lt;!&ndash;    <video id="myVideo" src="assets/media/test-video.mp4" autoplay muted onplay="onPlay(this)"></video>&ndash;&gt;-->
-<!--&lt;!&ndash;    <video id="myVideo" controls loop muted autoplay onplay="onPlay(this)">&ndash;&gt;-->
-<!--&lt;!&ndash;        <source src="assets/media/test-video.mp4" type="video/mp4">&ndash;&gt;-->
-<!--&lt;!&ndash;        Your browser does not support the video tag.&ndash;&gt;-->
-<!--&lt;!&ndash;    </video>&ndash;&gt;-->
-<!--    <canvas id="overlay" style="position:absolute; inset: 0" width="400" height="400"></canvas>-->
-<!--</div>-->
-
 <button id="btn" style="font-size: 24px; font-weight: 600; padding: 16px; width: 200px; border-radius: 12px">test</button>
+
+<!--<script></script>-->
+
 
 <script src="face-api.js"></script>
 <script>
@@ -85,34 +77,20 @@ async function onPlay (input) {
     const box_w = w_width * 0.6
     const box_h = v_height * 0.6
 
-    const box = {
-        x: box_x,
-        y: box_y,
-        width: box_w,
-        height: box_h
-    }
-    // const box = {
-    //     x: 100,
-    //     y: 100,
-    //     width: 200,
-    //     height: 200
-    // }
-    console.log('box', box);
-// see DrawBoxOptions below
-    const drawOptions = {
-        label: 'Hello I am a box!',
-        lineWidth: 2
-    }
-    const drawBox = new faceapi.draw.DrawBox(box, drawOptions)
-    drawBox.draw(canvas)
-
-    const regionsToExtract = [
-        new faceapi.Rect(box_x, box_y, box_w, box_h)
-    ]
-// actually extractFaces is meant to extract face regions from bounding boxes
-// but you can also use it to extract any other region
-    const canvases = await faceapi.extractFaces(input, regionsToExtract)
-    console.log('EXTRACT', canvases);
+//     const box = {
+//         x: box_x,
+//         y: box_y,
+//         width: box_w,
+//         height: box_h
+//     }
+//     console.log('box', box);
+// // see DrawBoxOptions below
+//     const drawOptions = {
+//         label: 'Hello I am a box!',
+//         lineWidth: 2
+//     }
+//     const drawBox = new faceapi.draw.DrawBox(box, drawOptions)
+//     drawBox.draw(canvas)
 
 
     const MODEL_URL = '/assets/weights'
@@ -132,51 +110,6 @@ async function onPlay (input) {
     }
 
     setTimeout(() => onPlay(input), 2000)
-
-//     const box = {
-//         // Set boundaries to their inverse infinity, so any number is greater/smaller
-//         bottom: -Infinity,
-//         left: Infinity,
-//         right: -Infinity,
-//         top: Infinity,
-//
-//         // Given the boundaries, we can compute width and height
-//         get height() {
-//             return this.bottom - this.top;
-//         },
-//
-//         get width() {
-//             return this.right - this.left;
-//         },
-//     };
-//
-// // Update the box boundaries
-//     for (const face of faces) {
-//         console.log('face', face);
-//         box.bottom = Math.max(box.bottom, face.box.bottom);
-//         box.left = Math.min(box.left, face.box.left);
-//         box.right = Math.max(box.right, face.box.right);
-//         box.top = Math.min(box.top, face.box.top);
-//     }
-//
-//     const canvas = document.createElement('canvas');
-//     const context = canvas.getContext('2d');
-//
-//     canvas.height = box.height;
-//     canvas.width = box.width;
-//
-//     context.drawImage(
-//       input,
-//       box.left,
-//       box.top,
-//       box.width,
-//       box.height,
-//       0,
-//       0,
-//       canvas.width,
-//       canvas.height
-//     );
-
 
     /* TEST start */
     // await faceapi.loadMtcnnModel(MODEL_URL)
@@ -204,40 +137,6 @@ async function onPlay (input) {
     // faceapi.draw.drawDetections('overlay', mtcnnResults.map(res => res.detection), { withScore: false })
     // faceapi.draw.drawFaceLandmarks('overlay', mtcnnResults.map(res => res.landmarks), { lineWidth: 4, color: 'red' })
     /* TEST end */
-
-    // await faceapi.loadSsdMobilenetv1Model(MODEL_URL)
-    // await faceapi.loadFaceLandmarkModel(MODEL_URL)
-    // await faceapi.loadFaceRecognitionModel(MODEL_URL)
-
-    // await faceapi.nets.ssdMobilenetv1.loadFromUri('/assets/weights')
-    // const net = new faceapi.SsdMobilenetv1()
-    // await net.loadFromUri('/assets/weights')
-    // console.log('net', net);
-
-    // const input = document.getElementById('myVideo')
-    // const canvas = document.getElementById('overlay')
-
-    // const options = new faceapi.MtcnnOptions(mtcnnForwardParams)
-    // const fullFaceDescriptions = await faceapi.detectAllFaces(input, options).withFaceLandmarks().withFaceDescriptors()
-    // console.log('fullFaceDescriptions', fullFaceDescriptions);
-
-    // 0.6 is a good distance threshold value to judge
-    // whether the descriptors match or not
-    // const maxDescriptorDistance = 0.6
-    // const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, maxDescriptorDistance)
-    //
-    // const results = fullFaceDescriptions.map(fd => faceMatcher.findBestMatch(fd.descriptor))
-    // console.log('results', results);
-
-    // setTimeout(() => onPlay(input))
-
-
-    /*****************************/
-    // let fullFaceDescriptions = await faceapi.detectAllFaces(input).withFaceLandmarks().withFaceDescriptors()
-    // console.log('fullFaceDescriptions', fullFaceDescriptions);
-    //
-    // faceapi.draw.drawDetections(canvas, fullFaceDescriptions)
-    // faceapi.draw.drawFaceLandmarks(canvas, fullFaceDescriptions)
 }
 
 </script>
