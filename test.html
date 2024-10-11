@@ -56,6 +56,10 @@ btn.addEventListener('click', () => {
     })
 })
 
+console.log('faceapi', faceapi);
+console.log('nets', faceapi.nets);
+console.log('options', new faceapi.TinyFaceDetectorOptions());
+
 async function onPlay (input) {
     console.log('input', input);
 
@@ -71,11 +75,16 @@ async function onPlay (input) {
     console.log('w_width', w_width);
     console.log('v_height', v_height);
 
+    const box_x = w_width * 0.2
+    const box_y = v_height * 0.2
+    const box_w = w_width * 0.6
+    const box_h = v_height * 0.6
+
     const box = {
-        x: w_width * 0.2,
-        y: v_height * 0.2,
-        width: w_width * 0.6,
-        height: v_height * 0.6
+        x: box_x,
+        y: box_y,
+        width: box_w,
+        height: box_h
     }
     // const box = {
     //     x: 100,
@@ -108,13 +117,121 @@ async function onPlay (input) {
     // const faces = await faceapi.detectAllFaces(input, new faceapi.TinyFaceDetectorOptions());
     // console.log('faces', faces);
 
-    const singleFace = await faceapi.detectSingleFace(input, new faceapi.TinyFaceDetectorOptions({minFaceSize: v_height * 0.5, box: drawBox}))
-        .withFaceLandmarks().withFaceExpressions().withFaceDescriptor();
+    const singleFace = await faceapi.detectSingleFace(input, new faceapi.TinyFaceDetectorOptions({minFaceSize: v_height * 0.5}));
     // const singleFace = await faceapi.detectSingleFace(input, {minFaceSize: 200});
     console.log('singleFace', singleFace);
 
+    if (singleFace?.box?.x >= box_x && singleFace?.box?.y >= box_y && singleFace?.box?.bottomRight?.x <= (box_x + box_w) && singleFace?.box?.bottomRight?.y <= (box_y + box_h)) {
+        console.log('singleFace--DETECT', singleFace);
+    }
+
     setTimeout(() => onPlay(input), 2000)
 
+//     const box = {
+//         // Set boundaries to their inverse infinity, so any number is greater/smaller
+//         bottom: -Infinity,
+//         left: Infinity,
+//         right: -Infinity,
+//         top: Infinity,
+//
+//         // Given the boundaries, we can compute width and height
+//         get height() {
+//             return this.bottom - this.top;
+//         },
+//
+//         get width() {
+//             return this.right - this.left;
+//         },
+//     };
+//
+// // Update the box boundaries
+//     for (const face of faces) {
+//         console.log('face', face);
+//         box.bottom = Math.max(box.bottom, face.box.bottom);
+//         box.left = Math.min(box.left, face.box.left);
+//         box.right = Math.max(box.right, face.box.right);
+//         box.top = Math.min(box.top, face.box.top);
+//     }
+//
+//     const canvas = document.createElement('canvas');
+//     const context = canvas.getContext('2d');
+//
+//     canvas.height = box.height;
+//     canvas.width = box.width;
+//
+//     context.drawImage(
+//       input,
+//       box.left,
+//       box.top,
+//       box.width,
+//       box.height,
+//       0,
+//       0,
+//       canvas.width,
+//       canvas.height
+//     );
+
+
+    /* TEST start */
+    // await faceapi.loadMtcnnModel(MODEL_URL)
+    // await faceapi.loadFaceRecognitionModel(MODEL_URL)
+    //
+    // const mtcnnForwardParams = {
+    //     // number of scaled versions of the input image passed through the CNN
+    //     // of the first stage, lower numbers will result in lower inference time,
+    //     // but will also be less accurate
+    //     maxNumScales: 10,
+    //     // scale factor used to calculate the scale steps of the image
+    //     // pyramid used in stage 1
+    //     scaleFactor: 0.709,
+    //     // the score threshold values used to filter the bounding
+    //     // boxes of stage 1, 2 and 3
+    //     scoreThresholds: [0.6, 0.7, 0.7],
+    //     // mininum face size to expect, the higher the faster processing will be,
+    //     // but smaller faces won't be detected
+    //     minFaceSize: 20
+    // }
+    //
+    // const mtcnnResults = await faceapi.mtcnn(input, mtcnnForwardParams)
+    // console.log('mtcnnResults', mtcnnResults);
+    //
+    // faceapi.draw.drawDetections('overlay', mtcnnResults.map(res => res.detection), { withScore: false })
+    // faceapi.draw.drawFaceLandmarks('overlay', mtcnnResults.map(res => res.landmarks), { lineWidth: 4, color: 'red' })
+    /* TEST end */
+
+    // await faceapi.loadSsdMobilenetv1Model(MODEL_URL)
+    // await faceapi.loadFaceLandmarkModel(MODEL_URL)
+    // await faceapi.loadFaceRecognitionModel(MODEL_URL)
+
+    // await faceapi.nets.ssdMobilenetv1.loadFromUri('/assets/weights')
+    // const net = new faceapi.SsdMobilenetv1()
+    // await net.loadFromUri('/assets/weights')
+    // console.log('net', net);
+
+    // const input = document.getElementById('myVideo')
+    // const canvas = document.getElementById('overlay')
+
+    // const options = new faceapi.MtcnnOptions(mtcnnForwardParams)
+    // const fullFaceDescriptions = await faceapi.detectAllFaces(input, options).withFaceLandmarks().withFaceDescriptors()
+    // console.log('fullFaceDescriptions', fullFaceDescriptions);
+
+    // 0.6 is a good distance threshold value to judge
+    // whether the descriptors match or not
+    // const maxDescriptorDistance = 0.6
+    // const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, maxDescriptorDistance)
+    //
+    // const results = fullFaceDescriptions.map(fd => faceMatcher.findBestMatch(fd.descriptor))
+    // console.log('results', results);
+
+    // setTimeout(() => onPlay(input))
+
+
+    /*****************************/
+    // let fullFaceDescriptions = await faceapi.detectAllFaces(input).withFaceLandmarks().withFaceDescriptors()
+    // console.log('fullFaceDescriptions', fullFaceDescriptions);
+    //
+    // faceapi.draw.drawDetections(canvas, fullFaceDescriptions)
+    // faceapi.draw.drawFaceLandmarks(canvas, fullFaceDescriptions)
 }
 
 </script>
