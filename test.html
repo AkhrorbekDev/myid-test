@@ -4,39 +4,42 @@
     <meta charset="UTF-8">
     <title>Title</title>
 <!--    <script type="module" crossorigin src="myid_assets/index.js"></script>-->
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            /*justify-content: center;*/
-            /*align-items: center;*/
-        }
+<!--    <script type="module" crossorigin src="face-api.js"></script>-->
+<!--    <style>-->
+<!--        body {-->
+<!--            margin: 0;-->
+<!--            padding: 0;-->
+<!--            width: 100vw;-->
+<!--            height: 100vh;-->
+<!--            display: flex;-->
+<!--            flex-direction: column;-->
+<!--            gap: 12px;-->
+<!--            /*justify-content: center;*/-->
+<!--            /*align-items: center;*/-->
+<!--        }-->
 
-        canvas {
-            position: absolute;
-        }
+<!--        canvas {-->
+<!--            position: absolute;-->
+<!--        }-->
 
-        #box {
-            width: 450px;
-            height: 325px;
-            position: absolute;
-            /*background-image: url("paper.png");*/
-            /*background-image: url("assets/images/white.png");*/
-            background-repeat: no-repeat;
-            background-size: 450px 325px;
-        }
-    </style>
+<!--        #box {-->
+<!--            width: 450px;-->
+<!--            height: 325px;-->
+<!--            position: absolute;-->
+<!--            /*background-image: url("paper.png");*/-->
+<!--            /*background-image: url("assets/images/white.png");*/-->
+<!--            background-repeat: no-repeat;-->
+<!--            background-size: 450px 325px;-->
+<!--        }-->
+<!--    </style>-->
 </head>
 <body style="padding: 0; margin: 0;">
 <!--<iframe id="myid_iframe" src="https://docs.myid.uz/iframe/" allow="camera;fullscreen" allowfullscreen-->
 <!--        border="0"></iframe>-->
 <!--<div id="myid_iframe"></div>-->
 <!--<span id="span"> IFrame response </span>-->
+<button id="btn" style="font-size: 24px; font-weight: 600; padding: 16px; width: 200px; border-radius: 12px">test</button>
+<div id="myid_window"></div>
 
 
 <!--<div style="position:relative;">-->
@@ -48,220 +51,293 @@
 
 <!--<div id="box"></div>-->
 <!--<video id="myVideo" width="500" height="375" autoplay muted onplay="onPlay(this)"></video>-->
-<video id="myVideo" autoplay muted onplay="onPlay(this)"></video>
-<canvas id="canvasBox" style="position: absolute; inset: 0;"></canvas>
-<!--<video id="myVideo" autoplay muted style="width: 100vw; height: auto;" onplay="onPlay(this)"></video>-->
-<button id="btn" style="font-size: 24px; font-weight: 600; padding: 16px; width: 200px; border-radius: 12px">test</button>
-<!--</body>-->
-<!--<br/>-->
+<!--<video id="myVideo" autoplay muted onplay="onPlay(this)"></video>-->
+<!--<canvas id="canvasBox" style="position: absolute; inset: 0;"></canvas>-->
+<!--<button id="btn" style="font-size: 24px; font-weight: 600; padding: 16px; width: 200px; border-radius: 12px">test</button>-->
 
-<script src="face-api.js"></script>
+
 <script>
-const video = document.getElementById('myVideo')
-const canvasBox = document.getElementById('canvasBox')
-// video.height = window.innerHeight * 0.8
-video.width = window.innerWidth
-// video.style.height = `${window.innerHeight * 0.8}px`
-video.style.height = 'auto'
-video.style.width = `${window.innerWidth}px`
+navigator.mediaDevices
+  .getUserMedia({
+      video: true,
+      camera: true
+  })
+  .then((stream) => {
+      console.log('stream', stream)
+      /* use the stream */
+  })
+  .catch((err) => {
+      console.log(err)
+      alert('Try one more time')
+      /* handle the error */
+  });
 
-const btn = document.getElementById('btn')
+const myIDRoot = document.getElementById('myid_window')
+const btn = document.getElementById('btn');
+
+const script = document.createElement('script')
+script.src = 'myid_assets/index.js'
+script.type = 'module'
+script.crossOrigin = true
+script.onload = () => {
+    console.log('script loaded!', window.MyID);
+    window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID
+}
+document.getElementsByTagName('head')[0].appendChild(script);
 
 btn.addEventListener('click', () => {
-    navigator.mediaDevices.getUserMedia({
-        video: true,
-        camera: true
-    }).then((stream) => {
-        video.srcObject = stream
-        video.addEventListener('loadedmetadata', () => {
-            console.log('loadedmetadata');
-            video.play();
-        });
+    console.log('BTN');
+    window.MyID.init(myIDRoot);
+    window.MyID.open({
+        callback: (data) => {
+            console.log(data)
+        }, creds: false, intro: false, locale: 'uz', nav: false, min: 1280
     })
 })
 
-// Promise.all([
-//     faceapi.nets.tinyFaceDetector.loadFromUri('/assets/weights'),
-//     faceapi.nets.faceLandmark68Net.loadFromUri('/assets/weights'),
-//     faceapi.nets.faceRecognitionNet.loadFromUri('/assets/weights'),
-//     faceapi.nets.faceExpressionNet.loadFromUri('/assets/weights')
-// ]).then(startVideo)
-//
-// function startVideo() {
-//     navigator.mediaDevices.getUserMedia({
-//         video: true,
-//         camera: true
-//     }).then((stream) => {
-//         video.srcObject = stream
-//         // video.addEventListener('loadedmetadata', () => {
-//         //     console.log('loadedmetadata');
-//         //     video.play();
-//         // });
-//     })
-// }
-
-async function onPlay () {
-    const v_width = video.width
-    const v_height = video.offsetHeight
-
-    canvasBox.height = v_height;
-    canvasBox.width = v_width;
-
-    console.log('v_width', v_width);
-    console.log('v_height', v_height);
-
-    const box_x = v_width * 0.2
-    const box_y = v_height * 0.2
-    const box_w = v_width * 0.6
-    const box_h = v_height * 0.6
-
-    const box = {
-        x: box_x,
-        y: box_y,
-        width: box_w,
-        height: box_h
-    }
-    console.log('box', box);
-    // see DrawBoxOptions below
-    const drawOptions = {
-        label: 'Hello I am a box!',
-        lineWidth: 2
-    }
-    const drawBox = new faceapi.draw.DrawBox(box, drawOptions)
-    drawBox.draw(canvasBox)
-
-    const MODEL_URL = '/assets/weights'
-
-    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL)
-    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)
-    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)
-    await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL)
-
-    const canvas = faceapi.createCanvasFromMedia(video)
-    document.body.append(canvas)
-    const displaySize = { width: video.width, height: video.offsetHeight }
-    faceapi.matchDimensions(canvas, displaySize)
-    setInterval(async () => {
-        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()
-        const count = await faceapi
-          .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())
-          .withFaceLandmarks()
-        console.log('count', count);
-        if(count.length>1){
-            alert("There are multiple faces in the frame. Please keep only one face");
-        }
-        else{
-            const resizedDetections = faceapi.resizeResults(detections, displaySize)
-            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)
-            console.log('resizedDetections', resizedDetections);
-            faceapi.draw.drawDetections(canvas, resizedDetections)
-            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)
-            faceapi.draw.drawFaceExpressions(canvas, resizedDetections)
-            // const landmarks = await faceapi.detectFaceLandmarks(video)
-            // const mouth = landmarks.getMouth()
-            // const nose = landmarks.getNose()
-            // const leftEye = landmarks.getLeftEye();
-            // console.log('mouth', mouth[0]._x, mouth[0]._y);
-            // console.log('nose', nose[0]._x, nose[0]._y)
-            // console.log('leftEye', leftEye[0]._x, leftEye[0]._y)
-            // if((((mouth[0]._x<=330) && (mouth[0]._x>=280)) && ((mouth[0]._y<=310) && (mouth[0]._y>=260))) &&
-            //   (((nose[0]._x<=320) && (nose[0]._x>=270)) && ((nose[0]._y<=220) && (nose[0]._y>=160))) &&
-            //   (((leftEye[0]._x<=270) && (leftEye[0]._x>=210)) && ((leftEye[0]._y<=240) && (leftEye[0]._y>=180))))
-            // {
-            //     alert("Click for perfect photo");
-            // }
-            // else{
-            //     // alert("Image not ready");
-            // }
-
-            const frame_height = resizedDetections[0].detection._box._height
-            const frame_width = resizedDetections[0].detection._box._width
-            const frame_x = resizedDetections[0].detection._box._x
-            const frame_y = resizedDetections[0].detection._box._y
-            const frame_br_x = resizedDetections[0].detection._box.bottomRight._x
-            const frame_br_y = resizedDetections[0].detection._box.bottomRight._y
-
-            if (box_x <= frame_x && box_y <= frame_y && (box_x + box_w) >= frame_br_x && (box_y + box_h) >= frame_br_y) {
-                console.log('SUCCESS!!!');
-                alert('success')
-            } else {
-                console.log('FAIL');
-            }
-
-        }
-    }, 100)
-
-    const Qe = aa("")
-    const Ht = aa({id: "", date: "", enabled: !1, nav: !0, min: 480})
-    const Cr = aa(r => {})
-    const Yn = aa("en")
-    const yt = {NODATA: 1, NOFACE: 16, TWOFACE: 256, TOOFAR: 4096, TOONEAR: 65536, NOTSTRAIGHT: 1048576}
-    const ut = {IDLE: 0, SUCCESS: 1, COUNTING: 2, NOT_READY: -1, ERROR: -2}
-    const An = {}
-    An[yt.NODATA] = "Loading...";
-    An[yt.NOFACE] = "No faces detected.";
-    An[yt.TWOFACE] = "Please exclude other faces from the frame.";
-    An[yt.TOOFAR] = "Please come closer to the camera.";
-    An[yt.TOONEAR] = "Please lean away from the camera.";
-    An[yt.NOTSTRAIGHT] = "Look straight into the camera, please.";
-
-    function Bo(r, t, e) {
-        return (e - r) / (t - r);
-    }
-
-    function Ta(r, t) {
-        return { _x: Bo(0, t.width, r._x), _y: Bo(0, t.height, r._y) };
-    }
-
-    const Tr = {
-        position: (r, t) => {
-            let e = r.alignedRect._box._x + r.alignedRect._box._width / 2, n = t.width / 2,
-              o = r.alignedRect._box._y + r.alignedRect._box._height / 2, a = t.height / 2,
-              i = Math.min(t.width, t.height);
-            return Math.abs(e - n) > i / 7 || Math.abs(o - a) > i / 7 ? -1 : 0
-        },
-        size: (r, t) => r.alignedRect._box._height / t.height < .4 ? -1 : r.alignedRect._box._height / t.height > .7 ? 1 : 0,
-        pan: (r, t) => {
-            const e = Ta(r.landmarks._positions[0], t), n = Ta(r.landmarks._positions[16], t),
-              o = Ta(r.landmarks._positions[30], t), a = .2;
-            return Bo(e._x, n._x, o._x) > .5 + a ? 1 : Bo(e._x, n._x, o._x) < .5 - a ? -1 : 0
-        }
-    };
-
-    function y1(r, t, e) {
-        let c, l, h, v = {};
-
-        let E = yt.NODATA, I = [];
-
-        function R(P) {
-            if (!c || !l || !h) return;
-            if (I.push(P), I.length > m1 && I.shift(), I.reduce((j, te) => j + te.length, 0) < 1) {
-                return e(0, E = yt.NOFACE);
-            }
-            const H = P[0];
-            if (!!H) {
-                if (e(5, h.ctx.fillStyle = "magenta", h), h.ctx.clearRect(0, 0, v.width, v.height), H.landmarks._positions.forEach((j, te) => {
-                    h.ctx.fillRect(j._x - 1, j._y - 1, 2, 2)
-                }), P.length > 1) {
-                    return e(0, E = yt.TWOFACE);
-                }
-                if (Tr.size(H, v) < 0) {
-                    return e(0, E = yt.TOOFAR);
-                }
-                if (Tr.size(H, v) > 0) {
-                    return e(0, E = yt.TOONEAR);
-                }
-                if (Tr.pan(H, v) > 0 || Tr.pan(H, v) < 0 || Tr.position(H, v) < 0) {
-                    return e(0, E = yt.NOTSTRAIGHT);
-                }
-                e(0, E = 0), H.alignedRect._box
-            }
-        }
-    }
-
-
-}
 </script>
+
+
+<!--START-->
+<!--<script src="face-api.js"></script>-->
+<!--<script>-->
+<!--const video = document.getElementById('myVideo')-->
+<!--const canvasBox = document.getElementById('canvasBox')-->
+<!--// video.height = window.innerHeight * 0.8-->
+<!--video.width = window.innerWidth-->
+<!--// video.style.height = `${window.innerHeight * 0.8}px`-->
+<!--video.style.height = 'auto'-->
+<!--video.style.width = `${window.innerWidth}px`-->
+
+<!--const btn = document.getElementById('btn')-->
+
+<!--btn.addEventListener('click', () => {-->
+<!--    navigator.mediaDevices.getUserMedia({-->
+<!--        video: true,-->
+<!--        camera: true-->
+<!--    }).then((stream) => {-->
+<!--        video.srcObject = stream-->
+<!--        video.addEventListener('loadedmetadata', () => {-->
+<!--            console.log('loadedmetadata');-->
+<!--            video.play();-->
+<!--        });-->
+<!--    })-->
+<!--})-->
+
+<!--// Promise.all([-->
+<!--//     faceapi.nets.tinyFaceDetector.loadFromUri('/assets/weights'),-->
+<!--//     faceapi.nets.faceLandmark68Net.loadFromUri('/assets/weights'),-->
+<!--//     faceapi.nets.faceRecognitionNet.loadFromUri('/assets/weights'),-->
+<!--//     faceapi.nets.faceExpressionNet.loadFromUri('/assets/weights')-->
+<!--// ]).then(startVideo)-->
+<!--//-->
+<!--// function startVideo() {-->
+<!--//     navigator.mediaDevices.getUserMedia({-->
+<!--//         video: true,-->
+<!--//         camera: true-->
+<!--//     }).then((stream) => {-->
+<!--//         video.srcObject = stream-->
+<!--//         // video.addEventListener('loadedmetadata', () => {-->
+<!--//         //     console.log('loadedmetadata');-->
+<!--//         //     video.play();-->
+<!--//         // });-->
+<!--//     })-->
+<!--// }-->
+
+<!--async function onPlay () {-->
+<!--    const v_width = video.width-->
+<!--    const v_height = video.offsetHeight-->
+
+<!--    canvasBox.height = v_height;-->
+<!--    canvasBox.width = v_width;-->
+
+<!--    console.log('v_width', v_width);-->
+<!--    console.log('v_height', v_height);-->
+
+<!--    const box_x = v_width * 0.2-->
+<!--    const box_y = v_height * 0.2-->
+<!--    const box_w = v_width * 0.6-->
+<!--    const box_h = v_height * 0.6-->
+
+<!--    const box = {-->
+<!--        x: box_x,-->
+<!--        y: box_y,-->
+<!--        width: box_w,-->
+<!--        height: box_h-->
+<!--    }-->
+<!--    console.log('box', box);-->
+<!--    // see DrawBoxOptions below-->
+<!--    const drawOptions = {-->
+<!--        label: 'Hello I am a box!',-->
+<!--        lineWidth: 2-->
+<!--    }-->
+<!--    const drawBox = new faceapi.draw.DrawBox(box, drawOptions)-->
+<!--    drawBox.draw(canvasBox)-->
+
+<!--    const MODEL_URL = '/assets/weights'-->
+
+<!--    await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL)-->
+<!--    await faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL)-->
+<!--    await faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL)-->
+<!--    await faceapi.nets.faceExpressionNet.loadFromUri(MODEL_URL)-->
+
+<!--    const canvas = faceapi.createCanvasFromMedia(video)-->
+<!--    document.body.append(canvas)-->
+<!--    const displaySize = { width: video.width, height: video.offsetHeight }-->
+<!--    faceapi.matchDimensions(canvas, displaySize)-->
+<!--    setInterval(async () => {-->
+<!--        const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceExpressions()-->
+<!--        const count = await faceapi-->
+<!--          .detectAllFaces(video, new faceapi.TinyFaceDetectorOptions())-->
+<!--          .withFaceLandmarks()-->
+<!--        console.log('count', count);-->
+<!--        if(count.length>1){-->
+<!--            alert("There are multiple faces in the frame. Please keep only one face");-->
+<!--        }-->
+<!--        else{-->
+<!--            const resizedDetections = faceapi.resizeResults(detections, displaySize)-->
+<!--            canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height)-->
+<!--            console.log('resizedDetections', resizedDetections);-->
+<!--            faceapi.draw.drawDetections(canvas, resizedDetections)-->
+<!--            faceapi.draw.drawFaceLandmarks(canvas, resizedDetections)-->
+<!--            faceapi.draw.drawFaceExpressions(canvas, resizedDetections)-->
+<!--            // const landmarks = await faceapi.detectFaceLandmarks(video)-->
+<!--            // const mouth = landmarks.getMouth()-->
+<!--            // const nose = landmarks.getNose()-->
+<!--            // const leftEye = landmarks.getLeftEye();-->
+<!--            // console.log('mouth', mouth[0]._x, mouth[0]._y);-->
+<!--            // console.log('nose', nose[0]._x, nose[0]._y)-->
+<!--            // console.log('leftEye', leftEye[0]._x, leftEye[0]._y)-->
+<!--            // if((((mouth[0]._x<=330) && (mouth[0]._x>=280)) && ((mouth[0]._y<=310) && (mouth[0]._y>=260))) &&-->
+<!--            //   (((nose[0]._x<=320) && (nose[0]._x>=270)) && ((nose[0]._y<=220) && (nose[0]._y>=160))) &&-->
+<!--            //   (((leftEye[0]._x<=270) && (leftEye[0]._x>=210)) && ((leftEye[0]._y<=240) && (leftEye[0]._y>=180))))-->
+<!--            // {-->
+<!--            //     alert("Click for perfect photo");-->
+<!--            // }-->
+<!--            // else{-->
+<!--            //     // alert("Image not ready");-->
+<!--            // }-->
+
+<!--            const frame_height = resizedDetections[0].detection._box._height-->
+<!--            const frame_width = resizedDetections[0].detection._box._width-->
+<!--            const frame_x = resizedDetections[0].detection._box._x-->
+<!--            const frame_y = resizedDetections[0].detection._box._y-->
+<!--            const frame_br_x = resizedDetections[0].detection._box.bottomRight._x-->
+<!--            const frame_br_y = resizedDetections[0].detection._box.bottomRight._y-->
+
+<!--            if (box_x <= frame_x && box_y <= frame_y && (box_x + box_w) >= frame_br_x && (box_y + box_h) >= frame_br_y) {-->
+<!--                console.log('SUCCESS!!!');-->
+<!--                alert('success')-->
+<!--            } else {-->
+<!--                console.log('FAIL');-->
+<!--            }-->
+
+<!--        }-->
+<!--    }, 100)-->
+
+<!--    // function aa(r, t = Rt) {-->
+<!--    //     let e;-->
+<!--    //     const n = new Set;-->
+<!--    //-->
+<!--    //     function o(s) {-->
+<!--    //         if (hn(r, s) && (r = s, e)) {-->
+<!--    //             const u = !sr.length;-->
+<!--    //             for (const c of n) c[1](), sr.push(c, r);-->
+<!--    //             if (u) {-->
+<!--    //                 for (let c = 0; c < sr.length; c += 2) sr[c][0](sr[c + 1]);-->
+<!--    //                 sr.length = 0;-->
+<!--    //             }-->
+<!--    //         }-->
+<!--    //     }-->
+<!--    //-->
+<!--    //     function a(s) {-->
+<!--    //         o(s(r));-->
+<!--    //     }-->
+<!--    //-->
+<!--    //     function i(s, u = Rt) {-->
+<!--    //         const c = [s, u];-->
+<!--    //         return n.add(c), n.size === 1 && (e = t(o) || Rt), s(r), () => {-->
+<!--    //             n.delete(c), n.size === 0 && (e(), e = null);-->
+<!--    //         };-->
+<!--    //     }-->
+<!--    //-->
+<!--    //     return { set: o, update: a, subscribe: i };-->
+<!--    // }-->
+
+<!--    const Qe = aa("")-->
+<!--    const Ht = aa({id: "", date: "", enabled: !1, nav: !0, min: 480})-->
+<!--    const Cr = aa(r => {})-->
+<!--    const Yn = aa("en")-->
+<!--    const yt = {NODATA: 1, NOFACE: 16, TWOFACE: 256, TOOFAR: 4096, TOONEAR: 65536, NOTSTRAIGHT: 1048576}-->
+<!--    const ut = {IDLE: 0, SUCCESS: 1, COUNTING: 2, NOT_READY: -1, ERROR: -2}-->
+<!--    const An = {}-->
+<!--    An[yt.NODATA] = "Loading...";-->
+<!--    An[yt.NOFACE] = "No faces detected.";-->
+<!--    An[yt.TWOFACE] = "Please exclude other faces from the frame.";-->
+<!--    An[yt.TOOFAR] = "Please come closer to the camera.";-->
+<!--    An[yt.TOONEAR] = "Please lean away from the camera.";-->
+<!--    An[yt.NOTSTRAIGHT] = "Look straight into the camera, please.";-->
+
+<!--    function Bo(r, t, e) {-->
+<!--        return (e - r) / (t - r);-->
+<!--    }-->
+
+<!--    function Ta(r, t) {-->
+<!--        return { _x: Bo(0, t.width, r._x), _y: Bo(0, t.height, r._y) };-->
+<!--    }-->
+
+<!--    const Tr = {-->
+<!--        position: (r, t) => {-->
+<!--            let e = r.alignedRect._box._x + r.alignedRect._box._width / 2, n = t.width / 2,-->
+<!--              o = r.alignedRect._box._y + r.alignedRect._box._height / 2, a = t.height / 2,-->
+<!--              i = Math.min(t.width, t.height);-->
+<!--            return Math.abs(e - n) > i / 7 || Math.abs(o - a) > i / 7 ? -1 : 0-->
+<!--        },-->
+<!--        size: (r, t) => r.alignedRect._box._height / t.height < .4 ? -1 : r.alignedRect._box._height / t.height > .7 ? 1 : 0,-->
+<!--        pan: (r, t) => {-->
+<!--            const e = Ta(r.landmarks._positions[0], t), n = Ta(r.landmarks._positions[16], t),-->
+<!--              o = Ta(r.landmarks._positions[30], t), a = .2;-->
+<!--            return Bo(e._x, n._x, o._x) > .5 + a ? 1 : Bo(e._x, n._x, o._x) < .5 - a ? -1 : 0-->
+<!--        }-->
+<!--    };-->
+
+<!--    function y1(r, t, e) {-->
+<!--        let c, l, h, v = {};-->
+
+<!--        let E = yt.NODATA, I = [];-->
+
+<!--        function R(P) {-->
+<!--            if (!c || !l || !h) return;-->
+<!--            if (I.push(P), I.length > m1 && I.shift(), I.reduce((j, te) => j + te.length, 0) < 1) {-->
+<!--                return e(0, E = yt.NOFACE);-->
+<!--            }-->
+<!--            const H = P[0];-->
+<!--            if (!!H) {-->
+<!--                if (e(5, h.ctx.fillStyle = "magenta", h), h.ctx.clearRect(0, 0, v.width, v.height), H.landmarks._positions.forEach((j, te) => {-->
+<!--                    h.ctx.fillRect(j._x - 1, j._y - 1, 2, 2)-->
+<!--                }), P.length > 1) {-->
+<!--                    return e(0, E = yt.TWOFACE);-->
+<!--                }-->
+<!--                if (Tr.size(H, v) < 0) {-->
+<!--                    return e(0, E = yt.TOOFAR);-->
+<!--                }-->
+<!--                if (Tr.size(H, v) > 0) {-->
+<!--                    return e(0, E = yt.TOONEAR);-->
+<!--                }-->
+<!--                if (Tr.pan(H, v) > 0 || Tr.pan(H, v) < 0 || Tr.position(H, v) < 0) {-->
+<!--                    return e(0, E = yt.NOTSTRAIGHT);-->
+<!--                }-->
+<!--                e(0, E = 0), H.alignedRect._box-->
+<!--            }-->
+<!--        }-->
+<!--    }-->
+
+
+<!--}-->
+<!--</script>-->
+<!--END-->
+
+
 <!--<script>-->
 <!--const videoEl = document.getElementById('myVideo')-->
 <!--// onPlay(videoEl)-->
@@ -374,55 +450,73 @@ async function onPlay () {
 
 <!--</script>-->
 
+<!--<script src="face-api.js"></script>-->
 <!--<script>-->
 
-<!--// navigator.mediaDevices-->
-<!--    //     .getUserMedia({-->
-<!--    //         video: true,-->
-<!--    //         camera: true-->
-<!--    //     })-->
-<!--    //     .then((stream) => {-->
-<!--    //         console.log('stream', stream)-->
-<!--    //         /* use the stream */-->
-<!--    //     })-->
-<!--    //     .catch((err) => {-->
-<!--    //         console.log(err)-->
-<!--    //         /* handle the error */-->
-<!--    //     });-->
-<!--    // const myIDRoot = document.createElement('div');-->
-<!--    // const btn = document.getElementById('btn');-->
-<!--    // const close = document.getElementById('close');-->
-<!--    // myIDRoot.id = 'myid_window';-->
-<!--    // document.body.appendChild(myIDRoot);-->
-<!--    // const iframe = document.getElementById('myid_iframe'); //Используйте refs, если вы используете React, Vue или другой подобный фреймворк https://vuejs.org/guide/essentials/template-refs.html-->
-<!--    // const script = document.createElement('script')-->
-<!--    // script.src = 'myid_assets/index.js'-->
-<!--    // script.type = 'module'-->
-<!--    // script.crossOrigin = true-->
-<!--    // script.onload = () => {-->
-<!--    //     console.log('script loaded!');-->
-<!--    //     console.log('init', window.MyID);-->
-<!--    //     console.log('myIDRoot', myIDRoot);-->
-<!--    //     window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID-->
-<!--    // }-->
-<!--    // document.getElementsByTagName('head')[0].appendChild(script);-->
-<!--    //-->
-<!--    //-->
-<!--    // window.addEventListener('message', function (e) {-->
-<!--    //     // Ваша логика...-->
-<!--    //-->
-<!--    //     if (e.data.cmd) {-->
-<!--    //         document.getElementById('span').innerText = JSON.stringify(e.data);-->
-<!--    //     }-->
-<!--    // });-->
-<!--    //-->
-<!--    // btn.addEventListener('click', () => {-->
-<!--    //     window.MyID.open({-->
-<!--    //         callback: (data) => {-->
-<!--    //             console.log(data)-->
-<!--    //         }, creds: false, intro: true, locale: 'uz', nav: false, min: 1280-->
-<!--    //     })-->
-<!--    // })-->
+<!--navigator.mediaDevices-->
+<!--        .getUserMedia({-->
+<!--            video: true,-->
+<!--            camera: true-->
+<!--        })-->
+<!--        .then((stream) => {-->
+<!--            console.log('stream', stream)-->
+<!--            /* use the stream */-->
+<!--        })-->
+<!--        .catch((err) => {-->
+<!--            console.log(err)-->
+<!--            alert('Try one more time')-->
+<!--            /* handle the error */-->
+<!--        });-->
+<!--    const myIDRoot = document.createElement('div');-->
+<!--    const btn = document.getElementById('btn');-->
+<!--    const close = document.getElementById('close');-->
+<!--    myIDRoot.id = 'myid_window';-->
+<!--    document.body.appendChild(myIDRoot);-->
+<!--    const iframe = document.getElementById('myid_iframe'); //Используйте refs, если вы используете React, Vue или другой подобный фреймворк https://vuejs.org/guide/essentials/template-refs.html-->
+<!--    const script = document.createElement('script')-->
+<!--    script.src = 'myid_assets/index.js'-->
+<!--    script.type = 'module'-->
+<!--    script.crossOrigin = true-->
+<!--    script.onload = () => {-->
+<!--        console.log('script loaded!');-->
+<!--        console.log('init', window.MyID);-->
+<!--        console.log('myIDRoot', myIDRoot);-->
+<!--        window.MyID.init(myIDRoot); // htmlNode - это элемент, в котором будет отображаться окно MyID-->
+<!--        // window.MyID.open({-->
+<!--        //     callback: (data) => {-->
+<!--        //         console.log(data)-->
+<!--        //     }, creds: false, intro: false, locale: 'uz', nav: false, min: 1280-->
+<!--        // })-->
+<!--        // setTimeout(() => {-->
+<!--        //     window.MyID.close()-->
+<!--        // }, 1)-->
+<!--    }-->
+<!--    document.getElementsByTagName('head')[0].appendChild(script);-->
+
+
+<!--    window.addEventListener('message', function (e) {-->
+<!--        // Ваша логика...-->
+
+<!--        console.log('CMD', e.data);-->
+<!--        if (e.data.cmd) {-->
+<!--            document.getElementById('span').innerText = JSON.stringify(e.data);-->
+<!--        }-->
+<!--    });-->
+
+<!--    btn.addEventListener('click', () => {-->
+<!--        console.log('BTN');-->
+<!--        window.MyID.init(myIDRoot);-->
+<!--        // if (window.MyID?.close) {-->
+<!--        //     window.MyID?.close()-->
+<!--        // }-->
+<!--        // setTimeout(() => {-->
+<!--            window.MyID.open({-->
+<!--                callback: (data) => {-->
+<!--                    console.log(data)-->
+<!--                }, creds: false, intro: false, locale: 'uz', nav: false, min: 1280-->
+<!--            })-->
+<!--        // }, 100)-->
+<!--    })-->
 <!--    // close.addEventListener('click', () => {-->
 <!--    //     window.MyID.close()-->
 <!--    // })-->
